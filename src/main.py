@@ -2,7 +2,7 @@
 from vex import *
 
 # Brain should be defined by default
-brain=Brain()
+brain=Brain();
 
 # Robot configuration code
 controller_1 = Controller(PRIMARY)

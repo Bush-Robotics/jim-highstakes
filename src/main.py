@@ -1,5 +1,6 @@
 #region VEXcode Generated Robot Configuration
 from vex import *
+import urandom
 
 # Brain should be defined by default
 brain=Brain()
@@ -7,17 +8,14 @@ brain=Brain()
 # Robot configuration code
 controller_1 = Controller(PRIMARY)
 intake = Motor(Ports.PORT11, GearSetting.RATIO_18_1, False)
-lift = Motor(Ports.PORT12, GearSetting.RATIO_18_1, False)
-left_motor_a = Motor(Ports.PORT2, GearSetting.RATIO_6_1, False)
-left_motor_b = Motor(Ports.PORT3, GearSetting.RATIO_6_1, False)
-left_drive_smart = MotorGroup(left_motor_a, left_motor_b)
-right_motor_a = Motor(Ports.PORT4, GearSetting.RATIO_6_1, True)
-right_motor_b = Motor(Ports.PORT5, GearSetting.RATIO_6_1, True)
-right_drive_smart = MotorGroup(right_motor_a, right_motor_b)
-drivetrain = DriveTrain(left_drive_smart, right_drive_smart, 319.19, 295, 40, MM, 1)
+lift = Motor(Ports.PORT12, GearSetting.RATIO_6_1, True)
 claw = DigitalOut(brain.three_wire_port.a)
-left_drive = Motor(Ports.PORT6, GearSetting.RATIO_6_1, False)
-right_drive = Motor(Ports.PORT7, GearSetting.RATIO_6_1, False)
+left_drive_motor_a = Motor(Ports.PORT2, GearSetting.RATIO_18_1, True)
+left_drive_motor_b = Motor(Ports.PORT3, GearSetting.RATIO_18_1, True)
+left_drive = MotorGroup(left_drive_motor_a, left_drive_motor_b)
+right_drive_motor_a = Motor(Ports.PORT4, GearSetting.RATIO_18_1, False)
+right_drive_motor_b = Motor(Ports.PORT5, GearSetting.RATIO_18_1, False)
+right_drive = MotorGroup(right_drive_motor_a, right_drive_motor_b)
 
 
 # wait for rotation sensor to fully initialize
@@ -60,8 +58,8 @@ def when_started1():
     global count3 
     count3 = 0
     global myVariable
-    drivetrain.set_drive_velocity(100,PERCENT)
-    drivetrain.set_turn_velocity(100,PERCENT)
+    #drivetrain.set_drive_velocity(100,PERCENT)
+    #drivetrain.set_turn_velocity(100,PERCENT)
     intake.set_stopping(COAST)
     intake.set_velocity(100,PERCENT)
     #clamp.set_velocity(100,PERCENT)
@@ -71,14 +69,16 @@ def when_started1():
     claw.set(True)
     left_drive.set_velocity(100,PERCENT)
     right_drive.set_velocity(100,PERCENT)
-    right_drive.set_stopping(COAST)
-    left_drive.set_stopping(COAST)
+    global speed 
+    speed = 0
+    global turnspeed
+    turnspeed = 0
+    global liftspeed
+    liftspeed = 100
     while True:
-        print("Drivetrain Temp: ")
-        print(drivetrain.temperature())
-        print("Left Motor Temp: ")
+        print("Left Drive: ")
         print(left_drive.temperature())
-        print("Right Motor Temp: ")
+        print("Right Drive: ")
         print(right_drive.temperature())
         if controller_1.buttonL1.pressing():
             claw.set(True)
@@ -109,30 +109,43 @@ def when_started1():
             intake.stop()
         if count2 == 1:
             intake.spin(REVERSE)
-        
-        
+
+        if controller_1.buttonDown.pressing():
+            lift.set_velocity(25,PERCENT)
+        if controller_1.buttonUp.pressing():
+            lift.set_velocity(100,PERCENT)
+        speed = (abs(controller_1.axis3.position())^2)
+        turnspeed = (abs(controller_1.axis1.position())^2)
         if controller_1.axis3.position() > 10:
             #drivetrain.set_drive_velocity((controller_1.axis3)^2)
-            drivetrain.drive(REVERSE)
-            left_drive.spin(REVERSE)
+            #drivetrain.drive(REVERSE)
+            left_drive.set_velocity(speed,PERCENT)
+            right_drive.set_velocity(speed,PERCENT)
+            left_drive.spin(FORWARD)
             right_drive.spin(FORWARD)
         if controller_1.axis3.position() < -10:
             #drivetrain.set_drive_velocity((controller_1.axis3)^2)
-            drivetrain.drive(FORWARD)
-            left_drive.spin(FORWARD)
+            #drivetrain.drive(FORWARD)left_drive.set_velocity(speed,PERCENT)
+            right_drive.set_velocity(speed,PERCENT)
+            left_drive.set_velocity(speed,PERCENT)
+            left_drive.spin(REVERSE)
             right_drive.spin(REVERSE)
         if controller_1.axis1.position() > 10:
             #drivetrain.set_turn_velocity((controller_1.axis1)^2)
-            drivetrain.turn(RIGHT)
+            #drivetrain.turn(RIGHT)
+            right_drive.set_velocity(turnspeed,PERCENT)
+            left_drive.set_velocity(turnspeed,PERCENT)
             left_drive.spin(FORWARD)
             right_drive.spin(REVERSE)
         if controller_1.axis1.position() < -10:
             #drivetrain.set_turn_velocity((controller_1.axis1)^2)
-            drivetrain.turn(LEFT)
+            #drivetrain.turn(LEFT)
+            right_drive.set_velocity(turnspeed,PERCENT)
+            left_drive.set_velocity(turnspeed,PERCENT)
             left_drive.spin(REVERSE)
             right_drive.spin(FORWARD)
         if controller_1.axis3.position() < 10 and controller_1.axis3.position()> -10 and controller_1.axis1.position() <10 and controller_1.axis1.position() > -10:
-            drivetrain.stop()
+            #drivetrain.stop()
             left_drive.stop()
             right_drive.stop()
         #if controller_1.buttonR2.pressing():

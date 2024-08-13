@@ -5,6 +5,10 @@ import urandom
 # Brain should be defined by default
 brain=Brain()
 
+DEADZONE = 10
+
+deadzone_squared = DEADZONE * DEADZONE
+
 # Robot configuration code
 controller_1 = Controller(PRIMARY)
 intake = Motor(Ports.PORT11, GearSetting.RATIO_18_1, False)
@@ -114,59 +118,25 @@ def when_started1():
             lift.set_velocity(25,PERCENT)
         if controller_1.buttonUp.pressing():
             lift.set_velocity(100,PERCENT)
-        speed = (abs(controller_1.axis3.position())^2)
-        turnspeed = (abs(controller_1.axis1.position())^2)
-        if controller_1.axis3.position() > 10:
-            #drivetrain.set_drive_velocity((controller_1.axis3)^2)
-            #drivetrain.drive(REVERSE)
-            left_drive.set_velocity(speed,PERCENT)
-            right_drive.set_velocity(speed,PERCENT)
-            left_drive.spin(FORWARD)
-            right_drive.spin(FORWARD)
-        if controller_1.axis3.position() < -10:
-            #drivetrain.set_drive_velocity((controller_1.axis3)^2)
-            #drivetrain.drive(FORWARD)left_drive.set_velocity(speed,PERCENT)
-            right_drive.set_velocity(speed,PERCENT)
-            left_drive.set_velocity(speed,PERCENT)
-            left_drive.spin(REVERSE)
-            right_drive.spin(REVERSE)
-        if controller_1.axis1.position() > 10:
-            #drivetrain.set_turn_velocity((controller_1.axis1)^2)
-            #drivetrain.turn(RIGHT)
-            right_drive.set_velocity(turnspeed,PERCENT)
-            left_drive.set_velocity(turnspeed,PERCENT)
-            left_drive.spin(FORWARD)
-            right_drive.spin(REVERSE)
-        if controller_1.axis1.position() < -10:
-            #drivetrain.set_turn_velocity((controller_1.axis1)^2)
-            #drivetrain.turn(LEFT)
-            right_drive.set_velocity(turnspeed,PERCENT)
-            left_drive.set_velocity(turnspeed,PERCENT)
-            left_drive.spin(REVERSE)
-            right_drive.spin(FORWARD)
-        if controller_1.axis3.position() < 10 and controller_1.axis3.position()> -10 and controller_1.axis1.position() <10 and controller_1.axis1.position() > -10:
-            #drivetrain.stop()
+        joystick_y = controller_1.axis3.position())
+        joystick_x = (controller_1.axis1.position())
+        if (joystick_x * joystick_x + joystick_y * joystick_y) > deadzone_squared:
+            left_wheel = (-joystick_x + joystick_y) / 2
+            right_wheel = (joystick_x + joystick_y) / 2
+            right_drive.spin(
+                    FORWARD,
+                    right_wheel,
+                    PERCENT,
+            )
+            left_drive.spin(
+                    FORWARD,
+                    left_drive,
+                    PERCENT,
+            )
+            
+        else:
             left_drive.stop()
             right_drive.stop()
-        #if controller_1.buttonR2.pressing():
-            #intake.spin(REVERSE)
-        #if controller_1.buttonL1.pressing():
-            #clamp.spin(FORWARD)
-        #if not controller_1.buttonR1.pressing() and not controller_1.buttonL1.pressing():
-            #clamp.stop()
-        #if controller_1.buttonR1.pressing():
-            #clamp.spin(REVERSE)
-        #if controller_1.buttonL2.pressing():
-            #intake.spin(FORWARD)
-        #if not controller_1.buttonL2.pressing() and not controller_1.buttonR2.pressing():
-            #intake.stop()
-        #if controller_1.buttonA.pressing():
-            #lift.spin(FORWARD)
-        #if controller_1.buttonB.pressing():
-            #lift.spin(REVERSE)
-        #if not controller_1.buttonA.pressing() and not controller_1.buttonB.pressing():
-            #lift.stop()
-        
-        
+
         wait(5,MSEC)
 when_started1()

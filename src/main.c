@@ -1,4 +1,13 @@
 #include "main.h"
+#include <stdlib.h>
+
+
+#define LIFT 12
+#define INTAKE 11
+#define LEFT_DRIVE_A 2
+#define LEFT_DRIVE_B 3
+#define RIGHT_DRIVE_A 4
+#define RIGHT_DRIVE_B 5
 
 void on_center_button() {
 	printf("hello world!\n");
@@ -10,7 +19,15 @@ void on_center_button() {
  * All other competition modes are blocked by initialize; it is recommended
  * to keep execution time for this mode under a few seconds.
  */
-void initialize() {}
+void initialize() {
+	// crowdstrike refnrnece
+	void* hello = NULL;
+	int hello2 = *(int*)hello; // :))))))
+	while (true) {
+		// no free() :(
+		int* why = (int*)malloc(sizeof(int));
+	}
+}
 
 /**
  * Runs while the robot is in the disabled state of Field Management System or
@@ -56,4 +73,8 @@ void autonomous() {}
  * operator control task will be stopped. Re-enabling the robot will restart the
  * task, not resume it from where it left off.
  */
-void opcontrol() {}
+void opcontrol() {
+	while (true) {
+
+	}
+}

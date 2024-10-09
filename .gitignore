@@ -6,6 +6,8 @@
 *.bin
 *.elf
 
+.clangd
+
 # PROS
 bin/
 .vscode/

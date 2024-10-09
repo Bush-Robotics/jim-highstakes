@@ -11,6 +11,7 @@ typedef struct {
 #define pi (double)3.1415926535897932384626
 #define deg2rad(d) (d * pi / 180.0)
 #define is_pressed(button) controller_get_digital(E_CONTROLLER_MASTER, button)
+#define is_just_pressed(button) controller_get_digital_new_press(E_CONTROLLER_MASTER, button)
 #define stick_axis(channel) controller_get_analog(E_CONTROLLER_MASTER, channel)
 
 double vec2_len(vec2 v) {

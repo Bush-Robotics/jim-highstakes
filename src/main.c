@@ -100,7 +100,7 @@ void drive_train_right(double speed) {
 
 void handle_drive(vec2 input) {
 	drive_train_right((input.x + input.y) * DRIVE_RATIO);
-	drive_train_left((-input.x + input.y) * DRIVE_RATIO);
+	drive_train_left((-input.x + input.y) * -DRIVE_RATIO);
 }
 
 void opcontrol() {
@@ -110,6 +110,15 @@ void opcontrol() {
 			lift_direction = is_pressed(DIGITAL_A) - is_pressed(DIGITAL_B);
 		}
 		motor_move_velocity(LIFT, lift_direction * LIFT_RATIO);
+
+		if (is_just_pressed(DIGITAL_L1)) {
+			intake = !intake; // toggle intake when L1 is pressed
+		}
+		if (intake) {
+			motor_move_velocity(INTAKE, INTAKE_RATIO);
+		} else {
+			motor_brake(INTAKE);
+		}
 
 		handle_drive(drive_input());
 

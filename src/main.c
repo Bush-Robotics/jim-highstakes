@@ -122,6 +122,6 @@ void opcontrol() {
 
 		handle_drive(drive_input());
 
-		delay(2);
+		delay(5);
 	}
 }

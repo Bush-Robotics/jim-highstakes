@@ -6,10 +6,10 @@
 // ports
 #define LIFT 12
 #define INTAKE 11
-#define LEFT_DRIVE_A 1
-#define LEFT_DRIVE_B 3
-#define RIGHT_DRIVE_A 4
-#define RIGHT_DRIVE_B 5
+#define LEFT_DRIVE_A 3
+#define LEFT_DRIVE_B 2
+#define RIGHT_DRIVE_A 5
+#define RIGHT_DRIVE_B 4
 
 // gear ratios
 #define INTAKE_RATIO E_MOTOR_GEARSET_18

@@ -4,15 +4,15 @@
 #include "utils.h"
 
 // ports
-#define LIFT 12
-#define INTAKE 11
+#define LIFT 11
+#define INTAKE 12
 #define LEFT_DRIVE_A 3
 #define LEFT_DRIVE_B 2
 #define RIGHT_DRIVE_A 5
 #define RIGHT_DRIVE_B 4
 
 // gear ratios
-#define INTAKE_RATIO E_MOTOR_GEARSET_18
+#define INTAKE_RATIO -E_MOTOR_GEARSET_18
 #define LIFT_RATIO E_MOTOR_GEARSET_06
 #define DRIVE_RATIO E_MOTOR_GEARSET_18
 
@@ -103,19 +103,28 @@ void handle_drive(vec2 input) {
 	drive_train_left((-input.x + input.y) * -DRIVE_RATIO);
 }
 
+void handle_lift() {
+		if (is_just_pressed(DIGITAL_L2)) {
+			if (abs(lift_direction)) {
+				lift_direction = 0;
+			} else {
+				lift_direction = -1;
+			}
+		}
+		if (is_just_pressed(DIGITAL_R2)) {
+			lift_direction = 1;
+		}
+		motor_move_velocity(LIFT, lift_direction * LIFT_RATIO * 100);
+}
 void opcontrol() {
 	while (true) {
-		// handle lift
-		if ((is_pressed(DIGITAL_A) || is_pressed(DIGITAL_B))) {
-			lift_direction = is_pressed(DIGITAL_A) - is_pressed(DIGITAL_B);
-		}
-		motor_move_velocity(LIFT, lift_direction * LIFT_RATIO);
 
-		if (is_just_pressed(DIGITAL_L1)) {
+		handle_lift();
+		if (is_just_pressed(DIGITAL_R1)) {
 			intake = !intake; // toggle intake when L1 is pressed
 		}
 		if (intake) {
-			motor_move_velocity(INTAKE, INTAKE_RATIO);
+			motor_move_velocity(INTAKE, INTAKE_RATIO * 100);
 		} else {
 			motor_brake(INTAKE);
 		}

@@ -15,10 +15,10 @@
 #define RIGHT_DRIVE_B 4
 
 // gear ratios
-#define INTAKE_RATIO -E_MOTOR_GEARSET_18
-#define LIFT_RATIO E_MOTOR_GEARSET_06
-#define DRIVE_RATIO E_MOTOR_GEARSET_18
-#define CLAW_RATIO -E_MOTOR_GEARSET_36
+#define INTAKE_RATIO -E_MOTOR_GEAR_GREEN
+#define LIFT_RATIO E_MOTOR_GEAR_BLUE
+#define DRIVE_RATIO E_MOTOR_GEAR_BLUE
+#define CLAW_RATIO -E_MOTOR_GEAR_RED
 
 #define DEADZONE 0.25
 const double DEADZONE_SQUARED = DEADZONE * DEADZONE;
@@ -26,6 +26,7 @@ const double DEADZONE_SQUARED = DEADZONE * DEADZONE;
 int lift_direction = 0; // -1 reverse, 0 stopped, 1, forward
 // count2
 bool intake = false;
+bool claw_break_mode = false;
 
 void on_center_button() {
 	printf("hello world!\n");
@@ -110,34 +111,28 @@ void handle_drive(vec2 input) {
 }
 
 void handle_lift() {
-		if (is_just_pressed(DIGITAL_L2)) {
-			if (abs(lift_direction)) {
-				lift_direction = 0;
-			} else {
-				lift_direction = -1;
-			}
+		if (is_just_pressed(DIGITAL_A)) {
+			lift_direction = !lift_direction;
 		}
-		if (is_just_pressed(DIGITAL_R2)) {
-			lift_direction = 1;
-		}
-		motor_move_velocity(LIFT, lift_direction * LIFT_RATIO * 100);
+		motor_move_velocity(LIFT, lift_direction * LIFT_RATIO * 200);
 	
 }
 
 void handle_claw() {
-	int axis = is_pressed(E_CONTROLLER_DIGITAL_RIGHT) - is_pressed(E_CONTROLLER_DIGITAL_LEFT);
+	int axis = is_pressed(DIGITAL_RIGHT) - is_pressed(DIGITAL_LEFT);
 	motor_move_velocity(CLAW_MOTOR, axis * CLAW_RATIO * 100);
 
-	if (axis == 0) {
-		motor_brake(CLAW_MOTOR);
+	if (is_just_pressed(DIGITAL_R1)) {
+		claw_break_mode = 1;
+	}
+	if (is_just_pressed(DIGITAL_L1)) {
+		claw_break_mode = 0;
 	}
 
-	if (is_pressed(DIGITAL_R1)) {
+	if (claw_break_mode) {
 		motor_set_brake_mode(CLAW_MOTOR, E_MOTOR_BRAKE_HOLD);
 		adi_digital_write(CLAW_PISTON, true);
-	}
-
-	if (is_pressed(DIGITAL_L1)) {
+	} else {
 		motor_set_brake_mode(CLAW_MOTOR, E_MOTOR_BRAKE_COAST);
 		adi_digital_write(CLAW_PISTON, false);
 	}
@@ -154,7 +149,7 @@ void opcontrol() {
 			intake = true;
 		}
 		if (intake) {
-			motor_move_velocity(INTAKE, INTAKE_RATIO * 100);
+			motor_move_velocity(INTAKE, INTAKE_RATIO * 200);
 		} else {
 			motor_brake(INTAKE);
 		}

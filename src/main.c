@@ -1,4 +1,5 @@
 #include "main.h"
+#include "pros/adi.h"
 #include "pros/misc.h"
 #include "pros/motors.h"
 #include "utils.h"
@@ -6,6 +7,8 @@
 // ports
 #define LIFT 11
 #define INTAKE 12
+#define CLAW_MOTOR 13
+#define CLAW_PISTON 'A'
 #define LEFT_DRIVE_A 3
 #define LEFT_DRIVE_B 2
 #define RIGHT_DRIVE_A 5
@@ -15,6 +18,7 @@
 #define INTAKE_RATIO -E_MOTOR_GEARSET_18
 #define LIFT_RATIO E_MOTOR_GEARSET_06
 #define DRIVE_RATIO E_MOTOR_GEARSET_18
+#define CLAW_RATIO -E_MOTOR_GEARSET_36
 
 #define DEADZONE 0.25
 const double DEADZONE_SQUARED = DEADZONE * DEADZONE;
@@ -33,7 +37,9 @@ void on_center_button() {
  * All other competition modes are blocked by initialize; it is recommended
  * to keep execution time for this mode under a few seconds.
  */
-void initialize() {}
+void initialize() {
+	adi_port_set_config(CLAW_PISTON, E_ADI_DIGITAL_OUT);
+}
 
 
 /**
@@ -115,13 +121,37 @@ void handle_lift() {
 			lift_direction = 1;
 		}
 		motor_move_velocity(LIFT, lift_direction * LIFT_RATIO * 100);
+	
 }
+
+void handle_claw() {
+	int axis = is_pressed(E_CONTROLLER_DIGITAL_RIGHT) - is_pressed(E_CONTROLLER_DIGITAL_LEFT);
+	motor_move_velocity(CLAW_MOTOR, axis * CLAW_RATIO * 100);
+
+	if (axis == 0) {
+		motor_brake(CLAW_MOTOR);
+	}
+
+	if (is_pressed(DIGITAL_R1)) {
+		motor_set_brake_mode(CLAW_MOTOR, E_MOTOR_BRAKE_HOLD);
+		adi_digital_write(CLAW_PISTON, true);
+	}
+
+	if (is_pressed(DIGITAL_L1)) {
+		motor_set_brake_mode(CLAW_MOTOR, E_MOTOR_BRAKE_COAST);
+		adi_digital_write(CLAW_PISTON, false);
+	}
+}
+
 void opcontrol() {
 	while (true) {
-
 		handle_lift();
-		if (is_just_pressed(DIGITAL_R1)) {
-			intake = !intake; // toggle intake when L1 is pressed
+		handle_claw();
+		if (is_just_pressed(DIGITAL_L2)) {
+			intake = false;
+		}
+		if (is_just_pressed(DIGITAL_R2)) {
+			intake = true;
 		}
 		if (intake) {
 			motor_move_velocity(INTAKE, INTAKE_RATIO * 100);

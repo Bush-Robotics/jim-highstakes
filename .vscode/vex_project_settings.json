@@ -1,0 +1,18 @@
+{
+	"project": {
+		"name": "HighStakesComp",
+		"slot": 3,
+		"description": "NOV 14 9:12PM",
+		"platform": "V5",
+		"creationDate": "Fri, 15 Nov 2024 05:13:03 GMT",
+		"language": "python",
+		"python": {
+			"main": "/src/main.py"
+		},
+		"sdkVersion": "V5_1_0_1_19"
+	},
+	"extension": {
+		"version": "0.6.0",
+		"json": 1
+	}
+}

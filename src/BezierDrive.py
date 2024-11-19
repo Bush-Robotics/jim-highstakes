@@ -32,17 +32,24 @@ def when_started1():
     t= 0
     x5 = []
     y5 = []
+
+    #velocity multiplier - speed percent or ratio (0-1)
     global velocity_multiplier
     velocity_multiplier = 1
+
     while True:
         global deadzone
+        #assign initial stick values
         ithrottle = controller_1.axis3.position()
         iturn = controller_1.axis1.position()
         global throttle
         global turn 
+
+        #apply bezier curve to stick inputs (redundant)
         throttle = ((1-ithrottle)**3 * x1 + 3*(1-ithrottle)**2*ithrottle * x2 + 3*(1-ithrottle)*ithrottle**2 * x3 + ithrottle**3 * x4)
         turn = ((1-iturn)**3 * x1 + 3*(1-iturn)**2*iturn * x2 + 3*(1-iturn)*iturn**2 * x3 + iturn**3 * x4)
 
+        #apply bezier curve to stick inputs if outside of deadzone
         if ithrottle > deadzone: 
             global throttle
             throttle = ((1-ithrottle)**3 * x1 + 3*(1-ithrottle)**2*ithrottle * x2 + 3*(1-ithrottle)*ithrottle**2 * x3 + ithrottle**3 * x4)
@@ -56,7 +63,7 @@ def when_started1():
              global turn 
              turn = -1 * ((1-iturn)**3 * x1 + 3*(1-iturn)**2*iturn * x2 + 3*(1-iturn)*iturn**2 * x3 + iturn**3 * x4)
 
-        #assign variables to motor speeds
+        #assign remapped stick positions to motor speeds
         global throttle
         global turn
         global left
@@ -74,6 +81,7 @@ def when_started1():
             right_drive.spin(FORWARD)
             left_drive.spin(FORWARD)
         else:
+
         #set motor velocities if not turning in place
             right_drive.set_velocity(velocity_multiplier*right, PERCENT)
             left_drive.set_velocity(velocity_multiplier*left, PERCENT)

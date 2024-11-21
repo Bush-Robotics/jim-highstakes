@@ -12,7 +12,7 @@
 		"slot": 1,
 		"sdkVersion": "V5_1_0_1_19",
 		"python": {
-			"main": "src/main.py"
+			"main": "src/BezierDrive.py"
 		}
 	}
 }

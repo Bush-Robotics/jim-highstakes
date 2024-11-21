@@ -19,6 +19,8 @@ claw = DigitalOut(brain.three_wire_port.a)
 def when_started1():
     #control points
     #graph: https://www.desmos.com/calculator/vigixi45si
+    right_drive.set_stopping(COAST)
+    left_drive.set_stopping(COAST)
     global deadzone
     deadzone = 10
     x1 = 0
@@ -40,8 +42,8 @@ def when_started1():
     while True:
         global deadzone
         #assign initial stick values
-        ithrottle = controller_1.axis3.position()
-        iturn = controller_1.axis1.position()
+        ithrottle = (controller_1.axis3.position() / 100)
+        iturn = (controller_1.axis1.position() / 100)
         global throttle
         global turn 
 

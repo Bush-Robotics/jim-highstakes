@@ -14,69 +14,85 @@ globaltheta=math.pi/2
 wheelbase=10
 xglobal=0
 yglobal=0
+previoustheta=0
+localradius=0
+avgtheta=0
 
 
 
 
-
-def polar_to_cartesian(r,theta):
+def Xfrompolar(r,theta):
     x = r * math.cos(theta)
+    return float(x)
+def Yfrompolar(r,theta):
     y = r * math.sin(theta)
-    return x, y
-def cartesian_to_polar(x,y):
+    return float(y)
+
+def Rfromcartesian(x,y):
     r = math.sqrt(x**2 + y**2) 
-    theta = math.atan2(y, x)
-    return r, theta
+    return float(r)
+def Thetafromcartesian(x,y):
+    theta = math.atan2(y,x)
+    return float(theta)
     
 def user_control():
-
-    global globaltheta, xglobal,yglobal,counter
+    xvector=0
+    yvector=0
+    global globaltheta, xglobal,yglobal,averagetheta,localradius,avgtheta
     odony.reset_position()
     motor1.reset_position()
     motor2.reset_position()
     while True:
-        counter+=1
-        ypos1=(motor2.position()/360)*wheelcirc 
-        ypos12=-(motor1.position()/360)*wheelcirc 
-        xpos1 =(odony.position()/360)*wheelcirc 
-        wait(10)
-        ypos2=(motor2.position()/360)*wheelcirc
-        ypos22=-(motor1.position()/360)*wheelcirc 
-        xpos2 =(odony.position()/360)*wheelcirc 
+        ypos1=-(motor2.position()/360)*wheelcirc 
+        ypos12=(motor1.position()/360)*wheelcirc 
+        xpos1 =-(odony.position()/360)*wheelcirc 
+        wait(100)
+        ypos2=-(motor2.position()/360)*wheelcirc
+        ypos22=(motor1.position()/360)*wheelcirc 
+        xpos2 =-(odony.position()/360)*wheelcirc 
 
         deltay1=ypos2-ypos1
         deltay2=ypos22-ypos12
         deltax=xpos2-xpos1
 
 
-        deltatheta=((deltay2-deltay1)/wheelbase)
+        deltatheta=((deltay1-deltay2)/wheelbase)
+        previoustheta=globaltheta
         globaltheta+=deltatheta
 
         #everything above this works - hooray!
 
-        #this is where it gets weird, the code is supposed to calculate the radius of the arc and use that in the math but it is wildly wrong
-        
+        #this actually works apparently lol
         try:
-            radius = (deltay2/deltatheta)+(5)
+            radius = (deltay1/deltatheta)+(5)
         except ZeroDivisionError:
             radius = 0
 
 
-
-        #sorry these variable names are horrid, this is part of the x,y local positioning vector
-        try:
-            vectordeltax=2*math.sin(globaltheta/2)*(deltax/deltatheta)-7
-        except ZeroDivisionError:
-            vectordeltax=0
-
-        #this is the part that turns it into polar and converts it into the global scope and then turns it back into cartesian
-        polar_theta_delta=float(cartesian_to_polar(vectordeltax,radius)[1])-(globaltheta+(deltatheta/2))
-        polar_radius_delta=float(cartesian_to_polar(vectordeltax,radius)[0])
-        xglobal+=float(polar_to_cartesian(polar_radius_delta,polar_theta_delta)[0])
-        yglobal+=float(polar_to_cartesian(polar_radius_delta,polar_theta_delta)[1])
         
+        #this works for going straight
+        if deltatheta==0:
+            yglobal+=deltay1
         
+        #rotations
+        
+        else:
+            
+            xvector=2*((deltax/deltatheta)+6.25)*(math.sin(deltatheta/2))
+            yvector=2*((deltay1/deltatheta)+4.5)*(math.sin(deltatheta/2))
 
-        print(radius, deltay2,deltatheta)
+            
+            avgtheta=previoustheta+(deltatheta/2)
+
+            localradius=Rfromcartesian(xvector,yvector)
+            localtheta=Thetafromcartesian(xvector,yvector)
+            localtheta=localtheta-avgtheta
+            xglobal+=Xfrompolar(localradius,localtheta)
+            yglobal+=Yfrompolar(localradius,localtheta)
+            
+
+        
+        print(xglobal,xglobal)
+
 
 user_control()

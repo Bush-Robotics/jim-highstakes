@@ -22,7 +22,7 @@ claw = DigitalOut(brain.three_wire_port.a)
 
 def when_started1():
     #control points
-    #graph: https://www.desmos.com/calculator/vigixi45si
+    #graph: https://www.desmos.com/calculator/0a5farialg 
     right_drive.set_stopping(COAST)
     left_drive.set_stopping(COAST)
     ithrottle = 0

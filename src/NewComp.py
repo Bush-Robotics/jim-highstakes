@@ -1,22 +1,24 @@
 from vex import * 
 
-brain = Brain()
-
+brain=Brain()
 controller_1 = Controller(PRIMARY)
-intake = Motor(Ports.PORT12, GearSetting.RATIO_18_1, False)
-lift = Motor(Ports.PORT11, GearSetting.RATIO_6_1, True)
+left_drive_motor_a = Motor(Ports.PORT2, GearSetting.RATIO_6_1, True)
+left_drive_motor_b = Motor(Ports.PORT3, GearSetting.RATIO_6_1, True)
+left_drive_motor_c = Motor(Ports.PORT4, GearSetting.RATIO_6_1, False)
+right_drive_motor_a = Motor(Ports.PORT15, GearSetting.RATIO_6_1, False)
+right_drive_motor_b = Motor(Ports.PORT16, GearSetting.RATIO_6_1, False)
+right_drive_motor_c = Motor(Ports.PORT17, GearSetting.RATIO_6_1, True)
+
+right_drive = MotorGroup(right_drive_motor_a, right_drive_motor_b, right_drive_motor_c)
+left_drive = MotorGroup(left_drive_motor_a, left_drive_motor_b, left_drive_motor_c)
+lbr = Motor(Ports.PORT13, GearSetting.RATIO_18_1, False)
+claw2 = Motor(Ports.PORT7, GearSetting.RATIO_36_1, True)
+intake = Motor(Ports.PORT11, GearSetting.RATIO_18_1, True)
+lift = Motor(Ports.PORT12, GearSetting.RATIO_6_1, True)
 claw = DigitalOut(brain.three_wire_port.a)
-right_drive_motor_a = Motor(Ports.PORT4, GearSetting.RATIO_6_1, False)
-right_drive_motor_b = Motor(Ports.PORT5, GearSetting.RATIO_6_1, False)
-right_drive = MotorGroup(right_drive_motor_a, right_drive_motor_b)
-claw2 = Motor(Ports.PORT13, GearSetting.RATIO_36_1, True)
-left_drive_motor_a = Motor(Ports.PORT2, GearSetting.RATIO_6_1, False)
-left_drive_motor_b = Motor(Ports.PORT3, GearSetting.RATIO_6_1, False)
-left_drive = MotorGroup(left_drive_motor_a, left_drive_motor_b)
-drivetrain = MotorGroup(left_drive_motor_a, left_drive_motor_b, right_drive_motor_a, right_drive_motor_b)
-doinker = Motor(Ports.PORT7, GearSetting.RATIO_36_1, False)
+claw3 = DigitalOut(brain.three_wire_port.b)
 
-
+lb = Rotation(Ports.PORT20, True)
 wait(30,MSEC)
 
 # add a small delay to make sure we don't print in the middle of the REPL header
@@ -78,24 +80,34 @@ def user_control():
     count3 = 0
     global count5 
     count5 = 0
+    global lbt
+    lbt = 0
+    global lbt2 
+    lbt2 = 0
+    global clk 
+    clk = 0
+    global clkc
+    clkc = 0
+    
 
     #initialize motors correctly
-    doinker.set_velocity(50,PERCENT)
-    doinker.set_max_torque(50,PERCENT)
-    doinker.set_stopping(COAST)
+    lbr.set_velocity(100,PERCENT)
+    lbr.set_max_torque(1000,PERCENT)
+    lbr.set_stopping(COAST)
     intake.set_stopping(COAST)
     intake.set_velocity(100,PERCENT)
     lift.set_stopping(COAST)
     lift.set_velocity(100,PERCENT)
-    claw.set(True)
+    claw.set(False)
+    claw3.set(False)
     left_drive.set_velocity(100,PERCENT)
     right_drive.set_velocity(100,PERCENT)
     global liftspeed
     liftspeed = 100
     global clawspeed
     clawspeed = 100
-    claw2.set_velocity(75,PERCENT)
-
+    lbr.set_position(0, DEGREES)
+    lb.set_position(0,DEGREES)
     #constants for controller stick smoothing math
     pi = 3.14159265359
     d2r = pi / 180
@@ -103,18 +115,25 @@ def user_control():
     c = 3.14159265359
 
     #stick deadzone 
-    deadzone = 10 
+    deadzone = 2 
     #velocity multiplier (speed fraction)
-    velocity_multiplier = .75
+    velocity_multiplier = 1
 
     while True:
+        lbr.set_velocity(400,PERCENT)
         claw2.set_velocity(clawspeed, PERCENT)
+        lbr.set_stopping(HOLD)
+        if (clk % 10 == 0):
+            clkc +=1
+        
         if controller_1.buttonR1.pressing():
             claw.set(True)
+            claw3.set(True)
             count5 = 1
 
         if controller_1.buttonL1.pressing():
             claw.set(False)
+            claw3.set(False)
             count5 = 0
 
         if controller_1.buttonA.pressing():
@@ -130,11 +149,50 @@ def user_control():
         if count == 1:
             lift.spin(FORWARD)
 
-        if controller_1.buttonLeft.pressing():
-            claw2.spin(FORWARD)
+        
+        if controller_1.buttonLeft.pressing(): 
+            lbt = 0
+            lbr.stop() 
+            clkc = 0 
+        if controller_1.buttonLeft.pressing() and clkc < 1: 
+            lb.set_position(0, DEGREES) 
+        
 
-        if controller_1.buttonRight.pressing():
-            claw2.spin(REVERSE)
+        #lady brown macros
+        if controller_1.buttonRight.pressing() and clkc > 1:
+            lbt += 1
+            clkc = 0
+            
+        
+        if (lbt == 1): 
+            lbr.spin(FORWARD)
+            lbt = 1
+            if lb.position() > 90:
+                lbr.stop()
+                lbt = 2
+        if lbt == 2: 
+            if not (controller_1.buttonDown.pressing()) and not (controller_1.buttonUp.pressing()):
+                lbr.stop()
+        if lbt == 3: 
+            lift.set_velocity(50,PERCENT)
+            lift.spin_for(REVERSE, 90, DEGREES, wait=True)
+            lift.set_velocity(100,PERCENT)
+            lbt = 4
+
+        if lbt == 4: 
+            lbr.spin(FORWARD)
+            if lb.position() > 720: 
+                lbr.stop() 
+        
+
+        if lbt == 5: 
+            lbr.spin(REVERSE)
+            if lb.position() < 1: 
+                lbr.stop()
+                lbt = 0
+        
+        
+            
 
         if not controller_1.buttonLeft.pressing() and not controller_1.buttonRight.pressing() and not controller_1.buttonR1.pressing() and not controller_1.buttonL1.pressing():
             claw2.stop()
@@ -154,26 +212,28 @@ def user_control():
         if count3 == 1:
             lift.spin(REVERSE)
         
-        if controller_1.buttonR2.pressing():
+        if controller_1.buttonR2.pressing(): 
             count2 = 1
-
         if controller_1.buttonL2.pressing():
-            count2 = 0
-
-        if count2 == 0:
-            intake.stop()
-
-        if count2 == 1:
+            count2 = 2 
+        if controller_1.buttonY.pressing():
+            count2 = 0 
+        if count2 == 1: 
+            intake.spin(FORWARD)
+        if count2 == 2: 
             intake.spin(REVERSE)
+        if count2 == 0: 
+            intake.stop()
+            
 
         if controller_1.buttonDown.pressing():
-            doinker.spin(REVERSE)
+            lbr.spin(REVERSE)
 
         if controller_1.buttonUp.pressing():
-            doinker.spin(FORWARD)
+            lbr.spin(FORWARD)
 
-        if not controller_1.buttonUp.pressing() and not controller_1.buttonDown.pressing():
-            doinker.stop()
+        if not controller_1.buttonUp.pressing() and not controller_1.buttonDown.pressing() and (lbt == 0) and (lbt2 == 0):
+            lbr.stop()
 
         #assign stick position to initial variables
         ithrottle = controller_1.axis3.position()
@@ -228,8 +288,8 @@ def user_control():
         if throttle < deadzone and throttle > -deadzone and turn < deadzone and turn > -deadzone:
             right_drive.stop()
             left_drive.stop()
-        
         #print values for debugging
+        '''
         print('turn: ')
         print(turn)
         print('throttle: ')
@@ -238,8 +298,20 @@ def user_control():
         print(left)
         print('right: ')
         print(right)
-
-        
+        '''
+        '''
+        print('Left Temp: ')
+        print(left_drive_motor_a.temperature())
+        print(left_drive_motor_b.temperature())
+        print('Right Temp: ')
+        print(right_drive.temperature())
+        print(right_drive_motor_a.temperature())
+        '''
+        print("LB Angle: ")
+        print(lb.position())
+        #print("LBT: ")
+        #print(lbt)
+        clk +=1
         wait(20,MSEC)
 
 # create competition instance

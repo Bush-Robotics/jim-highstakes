@@ -12,11 +12,10 @@ right_drive_motor_c = Motor(Ports.PORT17, GearSetting.RATIO_6_1, True)
 right_drive = MotorGroup(right_drive_motor_a, right_drive_motor_b, right_drive_motor_c)
 left_drive = MotorGroup(left_drive_motor_a, left_drive_motor_b, left_drive_motor_c)
 lbr = Motor(Ports.PORT13, GearSetting.RATIO_18_1, False)
-claw2 = Motor(Ports.PORT7, GearSetting.RATIO_36_1, True)
 intake = Motor(Ports.PORT11, GearSetting.RATIO_18_1, True)
 lift = Motor(Ports.PORT12, GearSetting.RATIO_6_1, True)
 claw = DigitalOut(brain.three_wire_port.a)
-claw3 = DigitalOut(brain.three_wire_port.b)
+claw2 = DigitalOut(brain.three_wire_port.b)
 clr = Optical(Ports.PORT10)
 
 lb = Rotation(Ports.PORT20, True)
@@ -26,6 +25,90 @@ wait(30,MSEC)
 wait(200, MSEC)
 # clear the console to make sure we don't have the REPL in the console
 print("\033[2J")
+liftcount = 0 
+def lady_brown(): 
+    global lbt, lbr, clkc, lift, liftcount
+    while True: 
+        if controller_1.buttonLeft.pressing(): 
+            lbt = 0
+            lbr.stop() 
+            clkc = 0 
+        if controller_1.buttonLeft.pressing() and clkc < 1: 
+            lb.set_position(0, DEGREES) 
+        if controller_1.buttonRight.pressing() and clkc > 1:
+            lbt += 1
+            clkc = 0
+        if (lbt == 1): 
+            lbr.spin_to_position(150, DEGREES, wait = True)
+            lbt = 2
+        if lbt == 3: 
+            lift.set_velocity(50,PERCENT)
+            liftcount = 0
+            lift.spin_for(REVERSE, 90,DEGREES)
+            lift.stop()
+            lift.set_velocity(100, PERCENT)
+            lbr.spin_to_position(790, DEGREES, wait = True)
+            lbt = 4
+        if lbt == 4 and liftcount == 3: 
+            lift.spin(FORWARD)
+        if lbt == 5: 
+            lbr.spin(REVERSE)
+            if lbr.position() < 5: 
+                lbr.stop() 
+                lbt = 0 
+
+        #print(lbr.position())
+
+        if controller_1.buttonDown.pressing():
+            lbr.spin(REVERSE)
+
+        if controller_1.buttonUp.pressing():
+            lbr.spin(FORWARD)
+
+        if not controller_1.buttonUp.pressing() and not controller_1.buttonDown.pressing() and lbt != 1 and lbt != 3 and lbt != 5:
+            lbr.stop()
+        print(lbt)
+        '''
+        if controller_1.buttonLeft.pressing(): 
+            lbt = 0
+            lbr.stop() 
+            clkc = 0 
+        if controller_1.buttonLeft.pressing() and clkc < 1: 
+            lb.set_position(0, DEGREES) 
+        #lady brown macros
+        if controller_1.buttonRight.pressing() and clkc > 1:
+            lbt += 1
+            clkc = 0
+        
+        if (lbt == 1): 
+            lbr.spin(FORWARD)
+            lbt = 1
+            if lb.position() > 90:
+                lbr.stop()
+                lbt = 2
+        if lbt == 2: 
+            if not (controller_1.buttonDown.pressing()) and not (controller_1.buttonUp.pressing()):
+                lbr.stop()
+        if lbt == 3: 
+            lift.set_velocity(50,PERCENT)
+            lift.spin_for(REVERSE, 90, DEGREES, wait=True)
+            lift.set_velocity(100,PERCENT)
+            lbt = 4
+
+        if lbt == 4: 
+            lbr.spin(FORWARD)
+            if lb.position() > 720: 
+                lbr.stop() 
+                lbt = 5
+        
+        if lbt == 5 and not controller_1.buttonUp.pressing() and not controller_1.buttonDown.pressing():
+            lbr.stop()
+        if lbt == 6: 
+            lbr.spin(REVERSE)
+            if lb.position() < 1: 
+                lbr.stop()
+                lbt = 0
+        '''
 
 def pre_autonomous():
     # actions to do when the program starts
@@ -57,11 +140,10 @@ def autonomous():
     right_drive.spin_for(REVERSE, 15/ratio, TURNS, wait=False)
     left_drive.spin_for(REVERSE, 15/ratio, TURNS, wait=True)
     claw.set(True)
-    claw3.set(True)
+    claw2.set(True)
     right_drive.spin_for(REVERSE, 2/ratio, TURNS, wait=False)
     left_drive.spin_for(REVERSE, 2/ratio, TURNS, wait=True)
     lift.spin_for(FORWARD, 5, TURNS)
-    global ct
     ct = 1
     
     wait(1,SECONDS)
@@ -69,50 +151,38 @@ def autonomous():
 
 def user_control():
     brain.screen.clear_screen()
-    #count variables for toggles
-    global count
-    count = 0
-    global count2 
-    count2 = 0
-    global count3 
+    global lbt, lbr, clkc
+    #liftcountvariables for toggles
+    liftcount= 0
+    intakecount = 0
     count3 = 0
-    global count5 
-    count5 = 0
-    global lbt
     lbt = 0
-    global lbt2 
     lbt2 = 0
-    global clk 
     clk = 0
-    global clkc
     clkc = 0
     
 
     #initialize motors correctly
     lbr.set_velocity(100,PERCENT)
     lbr.set_max_torque(1000,PERCENT)
-    lbr.set_stopping(HOLD)
     intake.set_stopping(COAST)
     intake.set_velocity(100,PERCENT)
     lift.set_stopping(COAST)
     lift.set_velocity(100,PERCENT)
     '''
-    global ct
     ct = 0
     if ct == 1: 
         claw.set(True)
-        claw3.set(True)
+        claw2.set(True)
     else:
         claw.set(False)
-        claw3.set(False)
+        claw2.set(False)
     '''
     claw.set(False)
-    claw3.set(False)
+    claw2.set(False)
     left_drive.set_velocity(100,PERCENT)
     right_drive.set_velocity(100,PERCENT)
-    global liftspeed
     liftspeed = 100
-    global clawspeed
     clawspeed = 100
     lbr.set_position(0, DEGREES)
     lb.set_position(0,DEGREES)
@@ -127,9 +197,11 @@ def user_control():
     #velocity multiplier (speed fraction)
     velocity_multiplier = 1
 
+    #call lb function on a separate thread 
+    lbr.set_position(0,DEGREES)
+    ladybrown = Thread(lady_brown)
     while True:
-        lbr.set_velocity(400,PERCENT)
-        claw2.set_velocity(clawspeed, PERCENT)
+        lbr.set_velocity(100,PERCENT)
         lbr.set_stopping(HOLD)
 
         if (clk % 10 == 0):
@@ -137,143 +209,72 @@ def user_control():
         
         if controller_1.buttonR1.pressing():
             claw.set(True)
-            claw3.set(True)
-            count5 = 1
-
+            claw2.set(True)
+    
         if controller_1.buttonL1.pressing():
             claw.set(False)
-            claw3.set(False)
-            count5 = 0
+            claw2.set(False)
 
         if controller_1.buttonA.pressing():
-            count = 1
+            liftcount= 1
 
         if controller_1.buttonB.pressing():
-            count = 0
+            liftcount= 0
             count3 = 0
 
-        if count == 0 and count3 == 0:
+        if liftcount== 0 and count3 == 0 and lbt != 3:
             lift.stop()
 
-        if count == 1:
+        if liftcount== 1 and lbt != 3:
             lift.spin(FORWARD)
 
         
-        if controller_1.buttonLeft.pressing(): 
-            lbt = 0
-            lbr.stop() 
-            clkc = 0 
-        if controller_1.buttonLeft.pressing() and clkc < 1: 
-            lb.set_position(0, DEGREES) 
-        
 
-        #lady brown macros
-        if controller_1.buttonRight.pressing() and clkc > 1:
-            lbt += 1
-            clkc = 0
-            
         
-        if (lbt == 1): 
-            lbr.spin(FORWARD)
-            lbt = 1
-            if lb.position() > 90:
-                lbr.stop()
-                lbt = 2
-        if lbt == 2: 
-            if not (controller_1.buttonDown.pressing()) and not (controller_1.buttonUp.pressing()):
-                lbr.stop()
-        if lbt == 3: 
-            lift.set_velocity(50,PERCENT)
-            lift.spin_for(REVERSE, 90, DEGREES, wait=True)
-            lift.set_velocity(100,PERCENT)
-            lbt = 4
-
-        if lbt == 4: 
-            lbr.spin(FORWARD)
-            if lb.position() > 720: 
-                lbr.stop() 
-                lbt = 5
-        
-        if lbt == 5 and not controller_1.buttonUp.pressing() and not controller_1.buttonDown.pressing():
-            lbr.stop()
-        if lbt == 6: 
-            lbr.spin(REVERSE)
-            if lb.position() < 1: 
-                lbr.stop()
-                lbt = 0
-        
-        
-            
-
-        if not controller_1.buttonLeft.pressing() and not controller_1.buttonRight.pressing() and not controller_1.buttonR1.pressing() and not controller_1.buttonL1.pressing():
-            claw2.stop()
-
-        if count5 == 1:
-            claw2.set_stopping(HOLD)
-
-        if count5 ==0: 
-            claw2.set_stopping(COAST)
 
         if controller_1.buttonX.pressing():
             count3 = 1
 
-        if count3== 0 and count == 0:
+        if count3== 0 and liftcount== 0 and lbt !=3:
             lift.stop()
 
-        if count3 == 1:
+        if count3 == 1 and lbt != 3:
             lift.spin(REVERSE)
         
         if controller_1.buttonR2.pressing(): 
-            count2 = 1
+            intakecount = 1
         if controller_1.buttonL2.pressing():
-            count2 = 2 
+            intakecount = 2 
         if controller_1.buttonY.pressing():
-            count2 = 0 
-        if count2 == 1: 
+            intakecount = 0 
+        if intakecount == 1: 
             intake.spin(FORWARD)
-        if count2 == 2: 
+        if intakecount == 2: 
             intake.spin(REVERSE)
-        if count2 == 0: 
+        if intakecount == 0: 
             intake.stop()
             
 
-        if controller_1.buttonDown.pressing():
-            lbr.spin(REVERSE)
-
-        if controller_1.buttonUp.pressing():
-            lbr.spin(FORWARD)
-
-        if not controller_1.buttonUp.pressing() and not controller_1.buttonDown.pressing() and (lbt == 0) and (lbt2 == 0):
-            lbr.stop()
+        
 
         #assign stick position to initial variables
         ithrottle = controller_1.axis3.position()
         iturn = controller_1.axis1.position()
-        global throttle 
-        global turn 
         #throwaway to bind variables
         throttle = ithrottle
         turn = iturn
 
         #smooth throttle and turn curve based on stick position
         if ithrottle > deadzone: 
-            global throttle
             throttle = 50 * math.cos(b*ithrottle - c)+50
         if ithrottle < -deadzone: 
-            global throttle
             throttle = -1 * (50 * math.cos(b*ithrottle - c)+50)
         if iturn > deadzone: 
-            global turn
             turn = 50 * math.cos(b*iturn - c)+50
         if iturn < -deadzone: 
-             global turn 
              turn = -1 * (50 * math.cos(b*iturn - c)+50)
 
         #assign variables to motor speeds
-        global throttle
-        global turn
-        global left
-        global right
         left = throttle + turn
         right = throttle - turn 
 
@@ -313,7 +314,7 @@ def user_control():
             if clkc > 1: 
                 clkc = 0
         if clkc < 1: 
-            count = 1
+            liftcount= 1
             print("RESTARTED!") 
         ''' 
         

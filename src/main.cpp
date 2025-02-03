@@ -1,38 +1,38 @@
 #include "main.h"
 
-pros::Motor intake(11, pros::MotorGearset::green);
-pros::Motor lift(12, pros::MotorGearset::blue);
+pros::Motor intake(-11, pros::MotorGearset::green);
+pros::Motor lift(-12, pros::MotorGearset::blue);
 pros::Motor lbr(13, pros::MotorGearset::green);
 pros::adi::DigitalOut claw('A', false);
 pros::adi::DigitalOut claw2('B', false);
 pros::adi::DigitalOut doinker('C', false);
 pros::Controller master (pros::E_CONTROLLER_MASTER);
-int liftcount = 0; 
+int liftcount;
 int ct = 0; 
-int auton = 0;
-int lbt = 0;
+int auton;
+int lbt;
 int clkc = 0; 
-int doinkcount = 0;
+int doinkcount;
 
 void lady_brown() { 
+  lbt = 0; 
 	while(true) { 
 		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_RIGHT)) { 
 			lbt ++; 
 		}
 		if (lbt == 1) { 
-			lbr.move_absolute(150, 200);
-			while (!((lbr.get_position() < 148) && (lbr.get_position() > 152))) { 
+			lbr.move_absolute(375, 200);
+			while (!((lbr.get_position() < 370) && (lbr.get_position() > 380))) { 
 				pros::delay(2);
 			}
-			lbt = 2;
 		}
 		if (lbt == 3) { 
-			lift.move_absolute(-90, 300);
-			while (!((lift.get_position() > -92) && (lift.get_position() < -88))) { 
+			lift.move_absolute(-450, 300);
+			while (!((lift.get_position() > -448) && (lift.get_position() < -452))) { 
 				pros::delay(2);
 			}
 			lift.brake();
-			lbr.move_absolute(790, 200);
+			lbr.move_absolute(1975, 200);
 			while (!((lbr.get_position() > 800) && (lbr.get_position() < 780))) { 
 				pros::delay(2);
 			lbt = 4;
@@ -61,6 +61,7 @@ void lady_brown() {
       lbt = 0; 
       lbr.move(0);
     }
+    pros::delay(20);
 	}
 }
 
@@ -76,7 +77,7 @@ ez::Drive chassis(
     {-2, -3, 4},     // Left Chassis Ports (negative port will reverse it!)
     {15, 16, -17},  // Right Chassis Ports (negative port will reverse it!)
 
-    7,      // IMU Port
+    5,      // IMU Port
     3.25,  // Wheel Diameter (Remember, 4" wheels without screw holes are actually 4.125!)
     450);   // Wheel RPM = cartridge * (motor gear / wheel gear)
 
@@ -146,6 +147,8 @@ void initialize() {
   chassis.initialize();
   ez::as::initialize();
   master.rumble(chassis.drive_imu_calibrated() ? "." : "---");
+  lbr.tare_position();
+  lbr.set_brake_mode(MOTOR_BRAKE_HOLD);
 }
 
 /**
@@ -330,11 +333,9 @@ void opcontrol() {
       claw2.set_value(true);
     }
     if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)) {
-      lift.move(127);
       liftcount = 1;
     }
     if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_B)) {
-      lift.brake();
       intake.brake();
       liftcount = 0;
     }
@@ -345,8 +346,16 @@ void opcontrol() {
       intake.move(-127);
     }
     if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_X)) { 
-      lift.move(-127);
       liftcount = 2;
+    }
+    if (liftcount == 0) {
+      lift.brake();
+    }
+    if (liftcount == 1) {
+      lift.move(127);
+    }
+    if (liftcount == 2) { 
+      lift.move(-127);
     }
     if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)) { 
       doinkcount ++; 

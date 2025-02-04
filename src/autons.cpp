@@ -145,7 +145,7 @@ void drive_and_turn() {
   //score with lb on alliance stake 
   pros::delay(20);
   lbt = 6; 
-  pros::delay(2000);
+  pros::delay(1000);
   lbt = 0; 
   lbt = 5; 
 

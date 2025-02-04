@@ -282,8 +282,9 @@ void lady_brown() {
 			lbr.move_absolute(1975, 200);
 			while (((lbr.get_position() < 1970) && (lbr.get_position() > 1980))) { 
 				pros::delay(2);
-			lbt = 4;
 			}	
+      if ((lbr.get_position() > 1970) && (lbr.get_position() < 1980));
+			lbt = 4;
 		}
 		if ((lbt == 4) && (lc == 3)) {
       liftcount = 1;

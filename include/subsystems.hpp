@@ -14,5 +14,6 @@ inline pros::adi::DigitalOut claw2('B', false);
 inline pros::adi::DigitalOut doinker('C', false);
 inline pros::Controller master (pros::E_CONTROLLER_MASTER);
 inline int lbt;
+inline int lb; 
 // inline pros::Motor intake(1);
 // inline pros::adi::DigitalIn limit_switch('A');

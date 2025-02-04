@@ -255,9 +255,9 @@ void ez_template_extras() {
  * operator control task will be stopped. Re-enabling the robot will restart the
  * task, not resume it from where it left off.
  */
+/**/
 
 void lady_brown() { 
-  lbt = 0; 
 	while(true) { 
 		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_RIGHT)) { 
 			lbt ++;
@@ -282,10 +282,6 @@ void lady_brown() {
 			lbr.move_absolute(1975, 200);
 			while (((lbr.get_position() < 1970) && (lbr.get_position() > 1980))) { 
 				pros::delay(2);
-        if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_RIGHT)) { 
-			    lbt ++;
-          break;
-		    }
 			lbt = 4;
 			}	
 		}
@@ -302,19 +298,18 @@ void lady_brown() {
         lbt = 0;
       }
 		}
+    
     if (lbt == 6) { 
-      lbr.move_absolute(1975, 200);
-			while (((lbr.get_position() < 1970) && (lbr.get_position() > 1980))) { 
-				pros::delay(2);
-      }
-      lbr.move_absolute(0, 200);
-			while (((lbr.get_position() > 5) && (lbr.get_position() < -2))) { 
+      lbr.move_absolute(1800, 200);
+			while (((lbr.get_position() < 1790) && (lbr.get_position() > 1810))) { 
 				pros::delay(2);
       }
       if (((lbr.get_position() < 5) && (lbr.get_position() > -2))) { 
         lbt = 0;
       }
     }
+
+    
     
 		if (master.get_digital(pros::E_CONTROLLER_DIGITAL_UP)) { 
 			lbr.move(127); 
@@ -333,6 +328,9 @@ void lady_brown() {
     pros::delay(20);
 	}
 }
+
+
+
 
 void opcontrol() {
   // This is preference to what you like to drive on

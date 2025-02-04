@@ -140,16 +140,51 @@ void turn_example() {
 ///
 // Combining Turn + Drive
 ///
+//NEG SIDE SOLO AWP / 2 TOP RING / 4 OR 5 RING TOTAL 
 void drive_and_turn() {
-  lbr.move_absolute(1975, 200);
-			while (((lbr.get_position() < 1970) && (lbr.get_position() > 1980))) { 
-				pros::delay(2);
-      }
-      lbr.move_absolute(0, 200);
-			while (((lbr.get_position() > 5) && (lbr.get_position() < -2))) { 
-				pros::delay(2);
-      }
-  chassis.pid_swing_set(ez::LEFT_SWING, 45_deg, -DRIVE_SPEED, -45);
+  //score with lb on alliance stake 
+  pros::delay(20);
+  lbt = 6; 
+  pros::delay(2000);
+  lbt = 0; 
+  lbt = 5; 
+
+  //swing back and left ~45 deg
+  chassis.pid_drive_set(12_in, DRIVE_SPEED);
+  chassis.pid_wait();
+  chassis.pid_turn_set(45_deg, TURN_SPEED);
+  chassis.pid_wait();
+  //drive backwards to pick up goal
+  chassis.pid_drive_set(50_in, DRIVE_SPEED, true);
+  chassis.pid_wait_until(40_in);
+  chassis.pid_speed_max_set(60); 
+  chassis.pid_wait_until(45_in);
+  claw.set_value(true);
+  claw.set_value(true);
+  chassis.pid_wait();
+  //spin lift to score ring 
+  lift.move(127);
+  // turn right > 90 deg, towards ring pile 
+  chassis.pid_turn_set(180_deg, TURN_SPEED);
+  chassis.pid_wait();
+  //spin intake 
+  intake.move(127);
+  //drive fwd into ring pile and pick up bottom two blues 
+  chassis.pid_swing_set(ez::LEFT_SWING, 45_deg, SWING_SPEED, 80);
+  chassis.pid_wait();
+  // turn left ~150 deg and drive fwd into blue bottom stack 
+  chassis.pid_turn_set(-150_deg, TURN_SPEED);
+  chassis.pid_wait();
+  chassis.pid_drive_set(30_in, DRIVE_SPEED);
+  chassis.pid_wait();
+  //turn left ~ 90 deg and drive fwd into ladder 
+  chassis.pid_turn_set(-90_deg, TURN_SPEED);
+  chassis.pid_wait();
+  chassis.pid_drive_set(50_in, DRIVE_SPEED, true); 
+  chassis.pid_wait();
+
+    
+  //chassis.pid_swing_set(ez::LEFT_SWING, 45_deg, -DRIVE_SPEED, -45);
 
 }
 /*void drive_and_turn() {

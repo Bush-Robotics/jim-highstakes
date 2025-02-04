@@ -425,7 +425,7 @@
     },
     "upload_options": {
       "description": "roboticsisez.com",
-      "icon": "pros",
+      "icon": "alien",
       "slot": 3
     },
     "use_early_access": false

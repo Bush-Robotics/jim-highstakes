@@ -11,7 +11,7 @@ const int TURN_SPEED = 90;
 const int SWING_SPEED = 110;
 
 ///
-// Constants
+// Constant
 ///
 void default_constants() {
   // P, I, D, and Start I
@@ -21,7 +21,7 @@ void default_constants() {
   chassis.pid_swing_constants_set(6.0, 0.0, 65.0);           // Swing constants
   chassis.pid_odom_angular_constants_set(6.5, 0.0, 52.5);    // Angular control for odom motions
   chassis.pid_odom_boomerang_constants_set(5.8, 0.0, 32.5);  // Angular control for boomerang motions
-
+  
   // Exit conditions
   chassis.pid_turn_exit_condition_set(90_ms, 3_deg, 250_ms, 7_deg, 500_ms, 500_ms);
   chassis.pid_swing_exit_condition_set(90_ms, 3_deg, 250_ms, 7_deg, 500_ms, 500_ms);
@@ -71,6 +71,59 @@ void drive_example() {
 // Turn Example
 ///
 void turn_example() {
+    //Go back
+  lbt = 0;
+  chassis.pid_drive_set(-30_in, 60, true);
+  chassis.pid_wait_until(-20_in);
+  chassis.pid_speed_max_set(60);
+  chassis.pid_wait_until(-26_in);
+  claw.set_value(true);
+  claw2.set_value(true);
+  chassis.pid_wait();
+  
+  chassis.pid_speed_max_set(DRIVE_SPEED);
+  chassis.pid_drive_set(-5_in, DRIVE_SPEED, false);
+  chassis.pid_wait();
+  lift.move(127);
+  
+  //grab goal
+  /*
+  //rotate 135 deg
+  chassis.pid_turn_set(135_deg, TURN_SPEED);
+  chassis.pid_wait();
+  
+  //intake donut
+  intake.move(127);
+  //move into donut pile
+  chassis.pid_drive_set(24_in, DRIVE_SPEED, true);
+  chassis.pid_wait();
+  //intake donut 
+  intake.move(127);
+  //rotate 45 deg
+  chassis.pid_turn_set(45_deg, TURN_SPEED);
+  chassis.pid_wait();
+  //intake donut
+  intake.move(127);
+  */
+
+
+  //Go back
+  //Grab Goal
+  //rotate -135 degrees
+  //Go forward (gently bump into donut pile)
+  //feed donut onto goal
+  //intake donut in pile
+  //rotate 45 degrees
+  //intake donut in pile
+  //rotate 45 degrees
+  //intake
+  //rotate X degrees
+  //go backward
+  //intake alliance side donut
+
+
+}
+/*void turn_example() {
   // The first parameter is the target in degrees
   // The second parameter is max speed the robot will drive at
 
@@ -83,11 +136,23 @@ void turn_example() {
   chassis.pid_turn_set(0_deg, TURN_SPEED);
   chassis.pid_wait();
 }
-
+*/
 ///
 // Combining Turn + Drive
 ///
 void drive_and_turn() {
+  lbr.move_absolute(1975, 200);
+			while (((lbr.get_position() < 1970) && (lbr.get_position() > 1980))) { 
+				pros::delay(2);
+      }
+      lbr.move_absolute(0, 200);
+			while (((lbr.get_position() > 5) && (lbr.get_position() < -2))) { 
+				pros::delay(2);
+      }
+  chassis.pid_swing_set(ez::LEFT_SWING, 45_deg, -DRIVE_SPEED, -45);
+
+}
+/*void drive_and_turn() {
   chassis.pid_drive_set(24_in, DRIVE_SPEED, true);
   chassis.pid_wait();
 
@@ -102,7 +167,7 @@ void drive_and_turn() {
 
   chassis.pid_drive_set(-24_in, DRIVE_SPEED, true);
   chassis.pid_wait();
-}
+} */
 
 ///
 // Wait Until and Changing Max Speed
@@ -376,3 +441,9 @@ void measure_offsets() {
 // . . .
 // Make your own autonomous functions here!
 // . . .
+void fiveRing_LeftRed(){
+
+
+
+
+}

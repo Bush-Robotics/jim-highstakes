@@ -1,69 +1,15 @@
 #include "main.h"
 
-pros::Motor intake(-11, pros::MotorGearset::green);
-pros::Motor lift(-12, pros::MotorGearset::blue);
-pros::Motor lbr(13, pros::MotorGearset::green);
-pros::adi::DigitalOut claw('A', false);
-pros::adi::DigitalOut claw2('B', false);
-pros::adi::DigitalOut doinker('C', false);
-pros::Controller master (pros::E_CONTROLLER_MASTER);
+
 int liftcount;
+int lc; 
 int ct = 0; 
 int auton;
-int lbt;
+
 int clkc = 0; 
 int doinkcount;
 
-void lady_brown() { 
-  lbt = 0; 
-	while(true) { 
-		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_RIGHT)) { 
-			lbt ++; 
-		}
-		if (lbt == 1) { 
-			lbr.move_absolute(375, 200);
-			while (!((lbr.get_position() < 370) && (lbr.get_position() > 380))) { 
-				pros::delay(2);
-			}
-		}
-		if (lbt == 3) { 
-			lift.move_absolute(-450, 300);
-			while (!((lift.get_position() > -448) && (lift.get_position() < -452))) { 
-				pros::delay(2);
-			}
-			lift.brake();
-			lbr.move_absolute(1975, 200);
-			while (!((lbr.get_position() > 800) && (lbr.get_position() < 780))) { 
-				pros::delay(2);
-			lbt = 4;
-			}	
-		}
-		if ((lbt == 4) && (liftcount == 3)) {
-			lift.move(127);
-		}
-		if (lbt == 5) { 
-			lbr.move_absolute(0, 200);
-			while (!((lbr.get_position() > 5) && (lbr.get_position() < -2))) { 
-				pros::delay(2);
-			}
-		}
 
-		if (master.get_digital(pros::E_CONTROLLER_DIGITAL_UP)) { 
-			lbr.move(127); 
-		}
-		if (master.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN)) { 
-			lbr.move(-127);
-		}
-		if (!(master.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN)) && !(master.get_digital(pros::E_CONTROLLER_DIGITAL_UP)) && (lbt != 1) && (lbt != 3) && (lbt != 5)) { 
-			lbr.brake();
-		}
-    if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_LEFT)) { 
-      lbt = 0; 
-      lbr.move(0);
-    }
-    pros::delay(20);
-	}
-}
 
 
 /////
@@ -86,7 +32,7 @@ ez::Drive chassis(
 //  - you should get positive values on the encoders going FORWARD and RIGHT
 // - `2.75` is the wheel diameter
 // - `4.0` is the distance from the center of the wheel to the center of the robot
-// ez::tracking_wheel horiz_tracker(8, 3.25, 4.0);  // This tracking wheel is perpendicular to the drive wheels
+ez::tracking_wheel horiz_tracker(6, 3.25, 4.0);  // This tracking wheel is perpendicular to the drive wheels
 // ez::tracking_wheel vert_tracker(9, 2.75, 4.0);   // This tracking wheel is parallel to the drive wheels
 
 /**
@@ -98,14 +44,13 @@ ez::Drive chassis(
 void initialize() {
   // Print our branding over your terminal :D
   ez::ez_template_print();
-
   pros::delay(500);  // Stop the user from doing anything while legacy ports configure
 
   // Look at your horizontal tracking wheel and decide if it's in front of the midline of your robot or behind it
   //  - change `back` to `front` if the tracking wheel is in front of the midline
   //  - ignore this if you aren't using a horizontal tracker
 
-  // chassis.odom_tracker_back_set(&horiz_tracker);
+  chassis.odom_tracker_back_set(&horiz_tracker);
 
   // Look at your vertical tracking wheel and decide if it's to the left or right of the center of the robot
   //  - change `left` to `right` if the tracking wheel is to the right of the centerline
@@ -114,7 +59,7 @@ void initialize() {
   // chassis.odom_tracker_left_set(&vert_tracker);
 
   // Configure your chassis controls
-  chassis.opcontrol_curve_buttons_toggle(true);   // Enables modifying the controller curve with buttons on the joysticks
+  chassis.opcontrol_curve_buttons_toggle(false);   // Enables modifying the controller curve with buttons on the joysticks
   chassis.opcontrol_drive_activebrake_set(0.0);   // Sets the active brake kP. We recommend ~2.  0 will disable.
   chassis.opcontrol_curve_default_set(0.0, 0.0);  // Defaults for curve. If using tank, only the first parameter is used. (Comment this line out if you have an SD card!)
 
@@ -276,8 +221,8 @@ void ez_template_extras() {
     //  When enabled:
     //  * use A and Y to increment / decrement the constants
     //  * use the arrow keys to navigate the constants
-    if (master.get_digital_new_press(DIGITAL_X))
-      chassis.pid_tuner_toggle();
+    //if (master.get_digital_new_press(DIGITAL_X))
+      //chassis.pid_tuner_toggle();
 
     // Trigger the selected autonomous routine
     if (master.get_digital(DIGITAL_B) && master.get_digital(DIGITAL_DOWN)) {
@@ -310,11 +255,91 @@ void ez_template_extras() {
  * operator control task will be stopped. Re-enabling the robot will restart the
  * task, not resume it from where it left off.
  */
+
+void lady_brown() { 
+  lbt = 0; 
+	while(true) { 
+		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_RIGHT)) { 
+			lbt ++;
+		}
+		if (lbt == 1) { 
+			lbr.move_absolute(375, 200);
+			while (((lbr.get_position() < 370) && (lbr.get_position() > 380))) { 
+				pros::delay(2);
+			}
+      if ((lbr.get_position() > 370) && (lbr.get_position() < 380)){ 
+        lbt = 2;
+      }
+		}
+		if (lbt == 3) { 
+      liftcount = 3; 
+      lc == 1; 
+			lift.move_absolute(-450, 300);
+			while (((lift.get_position() < -440) && (lift.get_position() > -460))) { 
+				pros::delay(2);
+			} 
+			lift.brake();
+			lbr.move_absolute(1975, 200);
+			while (((lbr.get_position() < 1970) && (lbr.get_position() > 1980))) { 
+				pros::delay(2);
+        if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_RIGHT)) { 
+			    lbt ++;
+          break;
+		    }
+			lbt = 4;
+			}	
+		}
+		if ((lbt == 4) && (lc == 3)) {
+      liftcount = 1;
+			lift.move(127);
+		}
+		if (lbt == 5) { 
+			lbr.move_absolute(0, 200);
+			while (((lbr.get_position() > 5) && (lbr.get_position() < -2))) { 
+				pros::delay(2);
+			}
+      if (((lbr.get_position() < 5) && (lbr.get_position() > -2))) { 
+        lbt = 0;
+      }
+		}
+    if (lbt == 6) { 
+      lbr.move_absolute(1975, 200);
+			while (((lbr.get_position() < 1970) && (lbr.get_position() > 1980))) { 
+				pros::delay(2);
+      }
+      lbr.move_absolute(0, 200);
+			while (((lbr.get_position() > 5) && (lbr.get_position() < -2))) { 
+				pros::delay(2);
+      }
+      if (((lbr.get_position() < 5) && (lbr.get_position() > -2))) { 
+        lbt = 0;
+      }
+    }
+    
+		if (master.get_digital(pros::E_CONTROLLER_DIGITAL_UP)) { 
+			lbr.move(127); 
+		}
+		if (master.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN)) { 
+			lbr.move(-127);
+		}
+		if (!(master.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN)) && !(master.get_digital(pros::E_CONTROLLER_DIGITAL_UP)) && (lbt != 1) && (lbt != 3) && (lbt != 5) && (lbt != 6)) { 
+			lbr.brake();
+		}
+    if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_LEFT)) { 
+      lbt = 0; 
+      lbr.move(0);
+    }
+    
+    pros::delay(20);
+	}
+}
+
 void opcontrol() {
   // This is preference to what you like to drive on
   chassis.drive_brake_set(MOTOR_BRAKE_COAST);
   lbr.set_brake_mode(MOTOR_BRAKE_HOLD);
   pros::Task ladybrown(lady_brown);
+  lbt = 0; 
   while (true) {
     // Gives you some extras to make EZ-Template ezier
     ez_template_extras();
@@ -329,8 +354,8 @@ void opcontrol() {
       claw2.set_value(true);
     }
     if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_L1)) { 
-      claw.set_value(true);
-      claw2.set_value(true);
+      claw.set_value(false);
+      claw2.set_value(false);
     }
     if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)) {
       liftcount = 1;
@@ -359,20 +384,20 @@ void opcontrol() {
     }
     if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)) { 
       doinkcount ++; 
-      if (doinkcount == 0) { 
-        doinker.set_value(false);
-      }
-      if (doinkcount == 1) { 
-        doinker.set_value(true);
-        doinkcount = 0; 
-      } 
-    
-      
+    }
+    if (doinkcount == 0) { 
+      doinker.set_value(false);
+    }
+    if (doinkcount == 1) { 
+      doinker.set_value(true);
+    }
+    if (doinkcount == 2) { 
+      doinker.set_value(false);
+      doinkcount = 0;
     }
     // . . .
     // Put more user control code here!
     // . . .
-
     pros::delay(ez::util::DELAY_TIME);  // This is used for timer calculations!  Keep this ez::util::DELAY_TIME
   }
 }

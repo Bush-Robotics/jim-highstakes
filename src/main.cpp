@@ -257,8 +257,10 @@ void ez_template_extras() {
  */
 /**/
 
+
 void lady_brown() { 
 	while(true) { 
+    printf("%d", lbt);
 		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_RIGHT)) { 
 			lbt ++;
 		}
@@ -283,8 +285,9 @@ void lady_brown() {
 			while (((lbr.get_position() < 1970) && (lbr.get_position() > 1980))) { 
 				pros::delay(2);
 			}	
-      if ((lbr.get_position() > 1970) && (lbr.get_position() < 1980));
+      if ((lbr.get_position() > 1970) && (lbr.get_position() < 1980)) {
 			lbt = 4;
+      }
 		}
 		if ((lbt == 4) && (lc == 3)) {
       liftcount = 1;

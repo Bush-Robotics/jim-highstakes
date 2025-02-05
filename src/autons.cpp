@@ -142,33 +142,65 @@ void turn_example() {
 ///
 //NEG SIDE SOLO AWP / 2 TOP RING / 4 OR 5 RING TOTAL 
 void drive_and_turn() {
+
   //score with lb on alliance stake 
   pros::delay(20);
-  lbt = 6; 
+  lbr.move_absolute(1800, 200);
+			while (((lbr.get_position() > 1810) && (lbr.get_position() < 1790))) { 
+				pros::delay(2);
+			}
   pros::delay(1000);
-  lbt = 0; 
-  lbt = 5; 
+  lbr.move_absolute(0,200);
+  while (((lbr.get_position() > 5) && (lbr.get_position() < -2))) { 
+				pros::delay(2);
+			}
+  pros::delay(1000);
 
+  
   //swing back and left ~45 deg
-  chassis.pid_drive_set(12_in, DRIVE_SPEED);
+  chassis.pid_drive_set(-31_in, DRIVE_SPEED, true);
   chassis.pid_wait();
-  chassis.pid_turn_set(45_deg, TURN_SPEED);
+  chassis.pid_turn_set(108_deg, 80);
   chassis.pid_wait();
   //drive backwards to pick up goal
-  chassis.pid_drive_set(50_in, DRIVE_SPEED, true);
-  chassis.pid_wait_until(40_in);
-  chassis.pid_speed_max_set(60); 
-  chassis.pid_wait_until(45_in);
+  chassis.pid_drive_set(-25_in, DRIVE_SPEED, true);
+  chassis.pid_wait();
+  chassis.pid_drive_set(-15_in, 90);
+  chassis.pid_wait_until(-9_in);
   claw.set_value(true);
   claw.set_value(true);
   chassis.pid_wait();
   //spin lift to score ring 
   lift.move(127);
   // turn right > 90 deg, towards ring pile 
-  chassis.pid_turn_set(180_deg, TURN_SPEED);
+  chassis.pid_turn_set(195_deg, TURN_SPEED);
   chassis.pid_wait();
+  //chassis.pid_drive_set(-14_in, 55, true);
+  //chassis.pid_wait();
   //spin intake 
   intake.move(127);
+  chassis.pid_drive_set(20_in, 70,true);
+  chassis.pid_wait();
+  chassis.pid_turn_relative_set(-33_deg, 80); 
+  chassis.pid_wait();
+  chassis.pid_drive_set(11_in, 70, false);
+  chassis.pid_wait();
+  chassis.pid_turn_relative_set(-90_deg, TURN_SPEED);
+  chassis.pid_wait();
+  chassis.pid_drive_set(20_in, DRIVE_SPEED);
+  chassis.pid_wait();
+  chassis.pid_turn_relative_set(-90_deg, TURN_SPEED);
+  chassis.pid_wait();
+  chassis.pid_drive_set(40_in, DRIVE_SPEED, true);
+  chassis.pid_wait();
+  
+
+
+  //chassis.pid_turn_set(165_deg, 40, true);
+  //chassis.pid_wait();
+  //chassis.pid_drive_set(35_in, 40, true);
+  //chassis.pid_wait();
+  /*
   //drive fwd into ring pile and pick up bottom two blues 
   chassis.pid_swing_set(ez::LEFT_SWING, 45_deg, SWING_SPEED, 80);
   chassis.pid_wait();
@@ -182,10 +214,9 @@ void drive_and_turn() {
   chassis.pid_wait();
   chassis.pid_drive_set(50_in, DRIVE_SPEED, true); 
   chassis.pid_wait();
-
     
   //chassis.pid_swing_set(ez::LEFT_SWING, 45_deg, -DRIVE_SPEED, -45);
-
+*/
 }
 /*void drive_and_turn() {
   chassis.pid_drive_set(24_in, DRIVE_SPEED, true);

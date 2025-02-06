@@ -275,15 +275,17 @@ void lady_brown() {
 		}
 		if (lbt == 3) { 
       liftcount = 3; 
-      lc == 1; 
 			lift.move_absolute(-450, 300);
 			while (((lift.get_position() < -440) && (lift.get_position() > -460))) { 
 				pros::delay(2);
 			} 
 			lift.brake();
 			lbr.move_absolute(1975, 200);
-			while (((lbr.get_position() < 1970) && (lbr.get_position() > 1980))) { 
+			while (((lbr.get_position() < 1970) && (lbr.get_position() > 1980)) && (lbt == 3)) { 
 				pros::delay(2);
+        if (master.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT)) { 
+          lbt = 4; 
+        }
 			}	
       if ((lbr.get_position() > 1970) && (lbr.get_position() < 1980)) {
 			lbt = 4;

@@ -9,7 +9,59 @@
 const int DRIVE_SPEED = 110;
 const int TURN_SPEED = 90;
 const int SWING_SPEED = 110;
-
+void redsort() { 
+  clr.set_integration_time(100);
+  clr.set_led_pwm(100);
+  while (true) {
+    pros::screen::erase();
+    pros::screen::print(pros::E_TEXT_LARGE, 1, "COLOR:  %f", clr.get_hue());
+    if (clr.get_hue() < 35) {
+      enc = lift.get_position();
+      pros::screen::erase();
+      pros::screen::print(pros::E_TEXT_LARGE, 3, "colorspotted");
+      while((lift.get_position() - enc) < 400) { 
+        pros::delay(2);
+      }
+      pros::screen::erase();
+      pros::screen::print(pros::E_TEXT_LARGE, 3, "COLORNUKE");
+      lift.move(-127);
+      pros::delay(50);
+      lift.brake();
+      pros::delay(1000);
+      lift.move(127);
+    }
+    else { 
+      lift.move(127);
+    }
+  }
+}
+void bluesort() { 
+  clr.set_integration_time(3);
+  clr.set_led_pwm(100);
+  lift.set_encoder_units(MOTOR_ENCODER_COUNTS);
+  while (true) {
+    pros::screen::erase();
+    pros::screen::print(pros::E_TEXT_LARGE, 3, "lift:  %f", lift.get_position());
+    if (clr.get_hue() > 160) {
+      enc = lift.get_position();
+      pros::screen::erase();
+      pros::screen::print(pros::E_TEXT_LARGE, 3, "colorspotted");
+      while((lift.get_position() - enc) < 400) { 
+        pros::delay(2);
+      }
+      pros::screen::erase();
+      pros::screen::print(pros::E_TEXT_LARGE, 3, "COLORNUKE");
+      lift.move(-127);
+      pros::delay(50);
+      lift.brake();
+      pros::delay(1000);
+      lift.move(127);
+    }
+    else { 
+      lift.move(127);
+    }
+  }
+}
 ///
 // Constant
 ///
@@ -142,36 +194,37 @@ void turn_example() {
 ///
 //NEG SIDE SOLO AWP / 2 TOP RING / 4 OR 5 RING TOTAL 
 void drive_and_turn() {
-
+  pros::Task clrsort(bluesort);
+  intake.move(127);
   //score with lb on alliance stake 
   pros::delay(20);
   lbr.move_absolute(1800, 200);
 			while (((lbr.get_position() > 1810) && (lbr.get_position() < 1790))) { 
 				pros::delay(2);
 			}
-  pros::delay(1000);
+  pros::delay(800);
   lbr.move_absolute(0,200);
   while (((lbr.get_position() > 5) && (lbr.get_position() < -2))) { 
 				pros::delay(2);
 			}
-  pros::delay(1000);
+  pros::delay(800);
 
-  
+    
   //swing back and left ~45 deg
   chassis.pid_drive_set(-31_in, DRIVE_SPEED, true);
   chassis.pid_wait();
-  chassis.pid_turn_set(108_deg, 80);
+  chassis.pid_turn_set(108_deg, 70, true);
   chassis.pid_wait();
   //drive backwards to pick up goal
-  chassis.pid_drive_set(-25_in, DRIVE_SPEED, true);
+  chassis.pid_drive_set(-25_in, DRIVE_SPEED);
   chassis.pid_wait();
-  chassis.pid_drive_set(-15_in, 90);
+  chassis.pid_drive_set(-15_in, 100);
   chassis.pid_wait_until(-9_in);
   claw.set_value(true);
   claw.set_value(true);
   chassis.pid_wait();
   //spin lift to score ring 
-  lift.move(127);
+
   // turn right > 90 deg, towards ring pile 
   chassis.pid_turn_set(195_deg, TURN_SPEED);
   chassis.pid_wait();
@@ -179,11 +232,11 @@ void drive_and_turn() {
   //chassis.pid_wait();
   //spin intake 
   intake.move(127);
-  chassis.pid_drive_set(20_in, 70,true);
+  chassis.pid_drive_set(20_in, 80,true);
   chassis.pid_wait();
   chassis.pid_turn_relative_set(-33_deg, 80); 
   chassis.pid_wait();
-  chassis.pid_drive_set(11_in, 70, false);
+  chassis.pid_drive_set(11_in, 80, false);
   chassis.pid_wait();
   chassis.pid_turn_relative_set(-90_deg, TURN_SPEED);
   chassis.pid_wait();
@@ -192,9 +245,11 @@ void drive_and_turn() {
   chassis.pid_turn_relative_set(-90_deg, TURN_SPEED);
   chassis.pid_wait();
   chassis.pid_drive_set(40_in, DRIVE_SPEED, true);
+  chassis.pid_wait_until(25_in);
+  clrsort.remove();
+  lift.brake();
   chassis.pid_wait();
-  
-
+  pros::delay(2000);
 
   //chassis.pid_turn_set(165_deg, 40, true);
   //chassis.pid_wait();

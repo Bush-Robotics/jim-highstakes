@@ -2,8 +2,8 @@
 
 void default_constants();
 
-void drive_example();
-void turn_example();
+void blue_negative();
+void blue_positive();
 void red_negative();
 void red_positive();
 void swing_example();

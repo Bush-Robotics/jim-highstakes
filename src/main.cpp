@@ -72,8 +72,8 @@ void initialize() {
 
   // Autonomous Selector using LLEMU
   ez::as::auton_selector.autons_add({
-      {"Drive\n\nDrive forward and come back", drive_example},
-      {"Turn\n\nTurn 3 times.", turn_example},
+      {"Blue Negative\n\nBlue negative 8pt solo AWP", blue_negative},
+      {"Blue Positive\n\nBlue positive 6pt solo AWP + 3rd goal", blue_positive},
       {"Red Positive\n\nRed negative 8pt solo AWP", red_negative},
       {"Red Positive\n\nRed positive 6pt solo AWP + 3rd goal", red_positive},
       {"Swing Turn\n\nSwing in an 'S' curve", swing_example},

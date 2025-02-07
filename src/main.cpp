@@ -74,8 +74,8 @@ void initialize() {
   ez::as::auton_selector.autons_add({
       {"Drive\n\nDrive forward and come back", drive_example},
       {"Turn\n\nTurn 3 times.", turn_example},
-      {"Drive and Turn\n\nDrive forward, turn, come back", drive_and_turn},
-      {"Drive and Turn\n\nSlow down during drive", wait_until_change_speed},
+      {"Red Positive\n\nRed negative 8pt solo AWP", red_negative},
+      {"Red Positive\n\nRed positive 6pt solo AWP + 3rd goal", red_positive},
       {"Swing Turn\n\nSwing in an 'S' curve", swing_example},
       {"Motion Chaining\n\nDrive forward, turn, and come back, but blend everything together :D", motion_chaining},
       {"Combine all 3 movements", combining_movements},
@@ -260,38 +260,40 @@ void ez_template_extras() {
 
 void lady_brown() { 
 	while(true) { 
-    printf("%d", lbt);
+    pros::screen::erase();
+    pros::screen::print(pros::E_TEXT_LARGE, 1, "%d", lbr.get_position());
 		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_RIGHT)) { 
 			lbt ++;
 		}
 		if (lbt == 1) { 
-			lbr.move_absolute(375, 200);
-			while (((lbr.get_position() < 370) && (lbr.get_position() > 380))) { 
+			lbr.move_absolute(425, 200);
+			while (((lbr.get_position() < 420) && (lbr.get_position() > 430))) { 
 				pros::delay(2);
 			}
-      if ((lbr.get_position() > 370) && (lbr.get_position() < 380)){ 
+      if ((lbr.get_position() > 420) && (lbr.get_position() < 430)){ 
         lbt = 2;
       }
 		}
 		if (lbt == 3) { 
       liftcount = 3; 
+      lift.tare_position();
 			lift.move_absolute(-450, 300);
 			while (((lift.get_position() < -440) && (lift.get_position() > -460))) { 
 				pros::delay(2);
 			} 
 			lift.brake();
-			lbr.move_absolute(1975, 200);
-			while (((lbr.get_position() < 1970) && (lbr.get_position() > 1980)) && (lbt == 3)) { 
+			lbr.move_absolute(2050, 200);
+			while (((lbr.get_position() < 2040) && (lbr.get_position() > 2060)) && (lbt == 3)) { 
 				pros::delay(2);
         if (master.get_digital(pros::E_CONTROLLER_DIGITAL_RIGHT)) { 
           lbt = 4; 
         }
 			}	
-      if ((lbr.get_position() > 1970) && (lbr.get_position() < 1980)) {
+      if ((lbr.get_position() > 2040) && (lbr.get_position() < 2060)) {
 			lbt = 4;
       }
 		}
-		if ((lbt == 4) && (lc == 3)) {
+		if (lbt == 4) {
       liftcount = 1;
 			lift.move(127);
 		}
@@ -304,16 +306,6 @@ void lady_brown() {
         lbt = 0;
       }
 		}
-    
-    if (lbt == 6) { 
-      lbr.move_absolute(1800, 200);
-			while (((lbr.get_position() < 1790) && (lbr.get_position() > 1810))) { 
-				pros::delay(2);
-      }
-      if (((lbr.get_position() < 5) && (lbr.get_position() > -2))) { 
-        lbt = 0;
-      }
-    }
 
     
     
@@ -328,7 +320,7 @@ void lady_brown() {
 		}
     if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_LEFT)) { 
       lbt = 0; 
-      lbr.move(0);
+      lbr.brake();
     }
     
     pros::delay(20);
@@ -342,8 +334,10 @@ void opcontrol() {
   // This is preference to what you like to drive on
   chassis.drive_brake_set(MOTOR_BRAKE_COAST);
   lbr.set_brake_mode(MOTOR_BRAKE_HOLD);
+  lbr.tare_position();
   pros::Task ladybrown(lady_brown);
   lbt = 0; 
+  
   while (true) {
     // Gives you some extras to make EZ-Template ezier
     ez_template_extras();

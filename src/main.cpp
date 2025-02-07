@@ -74,7 +74,7 @@ void initialize() {
   ez::as::auton_selector.autons_add({
       {"Blue Negative\n\nBlue negative 8pt solo AWP", blue_negative},
       {"Blue Positive\n\nBlue positive 6pt solo AWP + 3rd goal", blue_positive},
-      {"Red Positive\n\nRed negative 8pt solo AWP", red_negative},
+      {"Red Negative\n\nRed negative 8pt solo AWP", red_negative},
       {"Red Positive\n\nRed positive 6pt solo AWP + 3rd goal", red_positive},
       {"Swing Turn\n\nSwing in an 'S' curve", swing_example},
       {"Motion Chaining\n\nDrive forward, turn, and come back, but blend everything together :D", motion_chaining},

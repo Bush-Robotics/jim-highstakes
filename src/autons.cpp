@@ -105,6 +105,7 @@ void default_constants() {
 // Drive Example
 //Blue Negative
 void blue_negative() {
+  lbr.tare_position();
   lift.move(127);
   intake.move(127);
   //score with lb on alliance stake 
@@ -127,10 +128,8 @@ void blue_negative() {
   chassis.pid_turn_set(-108_deg, 70, true); // inconsistent at 70
   chassis.pid_wait();
   //drive backwards to pick up goal
-  chassis.pid_drive_set(-25_in, DRIVE_SPEED); // inconsistent at drive_speed
-  chassis.pid_wait();
-  chassis.pid_drive_set(-15_in, 100);// inconsistent at 100
-  chassis.pid_wait_until(-13_in);
+  chassis.pid_drive_set(-40_in, DRIVE_SPEED, true); // inconsistent at drive_speed
+  chassis.pid_wait_until(-38_in);
   claw.set_value(true);
   claw.set_value(true);
   chassis.pid_wait();
@@ -143,17 +142,18 @@ void blue_negative() {
   //chassis.pid_wait();
   //spin intake 
   intake.move(127);
-  chassis.pid_drive_set(12_in, 80, true); // inconsistent at 80 w/slew
+  chassis.pid_drive_set(10_in, 80, true); // inconsistent at 80 w/slew
   chassis.pid_wait();
   chassis.pid_turn_relative_set(33_deg, 80); // inconsistent at 80
   chassis.pid_wait();
-  chassis.pid_drive_set(14_in, 80, false); // inconsistent at 80
+  chassis.pid_drive_set(25_in, DRIVE_SPEED, false); // inconsistent at 80
   chassis.pid_wait();
+  pros::delay(500);
   chassis.pid_turn_relative_set(90_deg, TURN_SPEED); // inconsistent at turn_speed
   chassis.pid_wait();
   chassis.pid_drive_set(20_in, DRIVE_SPEED); // inconsistent at drive_speed
   chassis.pid_wait();
-  chassis.pid_turn_relative_set(90_deg, TURN_SPEED); // inconsistent at turn_speed
+  chassis.pid_turn_relative_set(105_deg, TURN_SPEED); // inconsistent at turn_speed
   chassis.pid_wait();
   chassis.pid_drive_set(40_in, DRIVE_SPEED, true); // inconsistent at drive_speed
   chassis.pid_wait_until(25_in);
@@ -228,8 +228,9 @@ void blue_positive() {
 
 //RED NEG SIDE SOLO AWP / 2 TOP RING / 8 PT TOTAL
 void red_negative() {
-  pros::Task clrsort(bluesort);
+  lbr.tare_position();
   intake.move(127);
+  lift.move(127);
   //score with lb on alliance stake 
   pros::delay(20);
   lbr.move_absolute(1800, 200);
@@ -280,7 +281,6 @@ void red_negative() {
   chassis.pid_wait();
   chassis.pid_drive_set(40_in, DRIVE_SPEED, true);
   chassis.pid_wait_until(25_in);
-  clrsort.remove();
   lift.brake();
   chassis.pid_wait();
   pros::delay(2000);
@@ -352,70 +352,198 @@ void red_positive() {
 ///
 // Swing Example
 ///
-void swing_example() {
+void blue_negative_noalliance() {
+  lbr.tare_position();
+  intake.move(127);
+    
+  //swing back and left ~45 deg
+  chassis.pid_drive_set(-31_in, DRIVE_SPEED, true); // inconsistent at drive_speed
+  chassis.pid_wait();
+  chassis.pid_turn_set(-108_deg, 70, true); // inconsistent at 70
+  chassis.pid_wait();
+  //drive backwards to pick up goal
+  chassis.pid_drive_set(-40_in, DRIVE_SPEED, true); // inconsistent at drive_speed
+  chassis.pid_wait_until(-38_in);
+  claw.set_value(true);
+  claw.set_value(true);
+  chassis.pid_wait();
+  //spin lift to score ring 
+  lift.move(127);
+  // turn right > 90 deg, towards ring pile 
+  chassis.pid_turn_set(-195_deg, TURN_SPEED); // inconsistent at turn_speed
+  chassis.pid_wait();
+  //chassis.pid_drive_set(-14_in, 55, true);
+  //chassis.pid_wait();
+  //spin intake 
+  intake.move(127);
+  chassis.pid_drive_set(10_in, 80, true); // inconsistent at 80 w/slew
+  chassis.pid_wait();
+  chassis.pid_turn_relative_set(33_deg, 80); // inconsistent at 80
+  chassis.pid_wait();
+  chassis.pid_drive_set(25_in, DRIVE_SPEED, false); // inconsistent at 80
+  chassis.pid_wait();
+  pros::delay(500);
+  chassis.pid_turn_relative_set(90_deg, TURN_SPEED); // inconsistent at turn_speed
+  chassis.pid_wait();
+  chassis.pid_drive_set(20_in, DRIVE_SPEED); // inconsistent at drive_speed
+  chassis.pid_wait();
+  chassis.pid_turn_relative_set(105_deg, TURN_SPEED); // inconsistent at turn_speed
+  chassis.pid_wait();
+  chassis.pid_drive_set(40_in, DRIVE_SPEED, true); // inconsistent at drive_speed
+  chassis.pid_wait_until(25_in);
+  lift.brake();
+  chassis.pid_wait();
+  pros::delay(2000);
+}
+
+///
+// Turn Example
+///
+void blue_positive_noalliance() {
+  lbr.tare_position();
+  //score with lb on alliance stake 
+
+    
+  //swing back and left ~45 deg
+  chassis.pid_drive_set(-31_in, DRIVE_SPEED, true);
+  chassis.pid_wait();
+  chassis.pid_turn_set(108_deg, 70, true);
+  chassis.pid_wait();
+  //drive backwards to pick up goal
+  chassis.pid_drive_set(-40_in, DRIVE_SPEED, true);
+  chassis.pid_wait_until(-38_in);
+  claw.set_value(true);
+  claw.set_value(true);
+  chassis.pid_wait();
+
+  lift.move(127);
+  //turn to face 2-ring stack
+  chassis.pid_turn_relative_set(35_deg, TURN_SPEED); 
+  chassis.pid_wait();
+  intake.move(127);
+  chassis.pid_drive_set(29_in, DRIVE_SPEED);
+  chassis.pid_wait();
+  chassis.pid_turn_relative_set(105_deg, TURN_SPEED); 
+  chassis.pid_wait();
+  chassis.pid_drive_set(-5_in, DRIVE_SPEED);
+  chassis.pid_wait();
+  claw2.set_value(false);
+  claw.set_value(false);
+  chassis.pid_drive_set(7_in, DRIVE_SPEED);
+  chassis.pid_wait();
+  chassis.pid_turn_relative_set(-170_deg, TURN_SPEED);
+  chassis.pid_wait();
+  chassis.pid_drive_set(-19_in, DRIVE_SPEED);
+  chassis.pid_wait_until(-17_in);
   claw.set_value(true);
   claw2.set_value(true);
-  pros::Task clrsort(bluesort);
-  intake.move(127);
-  // // The first parameter is ez::LEFT_SWING or ez::RIGHT_SWING
-  // // The second parameter is the target in degrees
-  // // The third parameter is the speed of the moving side of the drive
-  // // The fourth parameter is the speed of the still side of the drive, this allows for wider arcs
-
-  // chassis.pid_swing_set(ez::LEFT_SWING, 45_deg, SWING_SPEED, 45);
-  // chassis.pid_wait();
-
-  // chassis.pid_swing_set(ez::RIGHT_SWING, 0_deg, SWING_SPEED, 45);
-  // chassis.pid_wait();
-
-  // chassis.pid_swing_set(ez::RIGHT_SWING, 45_deg, SWING_SPEED, 45);
-  // chassis.pid_wait();
-
-  // chassis.pid_swing_set(ez::LEFT_SWING, 0_deg, SWING_SPEED, 45);
-  // chassis.pid_wait();
+  chassis.pid_wait();
+  chassis.pid_turn_relative_set(-90_deg, TURN_SPEED);
+  lbr.move_absolute(1400, 200);
+  while ((lbr.get_position() < 1390) && (lbr.get_position() > 1410)) { 
+    pros::delay(2);
+  }
+  chassis.pid_drive_set(30_in, 60, true);
+  chassis.pid_wait();
 }
 
 ///
 // Motion Chaining
 ///
-void motion_chaining() {
-  // Motion chaining is where motions all try to blend together instead of individual movements.
-  // This works by exiting while the robot is still moving a little bit.
-  // To use this, replace pid_wait with pid_wait_quick_chain.
-  chassis.pid_drive_set(24_in, DRIVE_SPEED, true);
+void red_negative_noalliance() {
+  lbr.tare_position();
+  intake.move(127);
+  //swing back and left ~45 deg
+  chassis.pid_drive_set(-31_in, DRIVE_SPEED, true);
   chassis.pid_wait();
-
-  chassis.pid_turn_set(45_deg, TURN_SPEED);
-  chassis.pid_wait_quick_chain();
-
-  chassis.pid_turn_set(-45_deg, TURN_SPEED);
-  chassis.pid_wait_quick_chain();
-
-  chassis.pid_turn_set(0_deg, TURN_SPEED);
+  chassis.pid_turn_set(108_deg, 70, true);
   chassis.pid_wait();
-
-  // Your final motion should still be a normal pid_wait
-  chassis.pid_drive_set(-24_in, DRIVE_SPEED, true);
+  //drive backwards to pick up goal
+  chassis.pid_drive_set(-25_in, DRIVE_SPEED);
   chassis.pid_wait();
+  chassis.pid_drive_set(-15_in, 100);
+  chassis.pid_wait_until(-13_in);
+  claw.set_value(true);
+  claw.set_value(true);
+  chassis.pid_wait();
+  //spin lift to score ring 
+  lift.move(127);
+  // turn right > 90 deg, towards ring pile 
+  chassis.pid_turn_set(195_deg, TURN_SPEED);
+  chassis.pid_wait();
+  //chassis.pid_drive_set(-14_in, 55, true);
+  //chassis.pid_wait();
+  //spin intake 
+  intake.move(127);
+  chassis.pid_drive_set(20_in, 80,true);
+  chassis.pid_wait();
+  chassis.pid_turn_relative_set(-33_deg, 80); 
+  chassis.pid_wait();
+  chassis.pid_drive_set(11_in, 80, false);
+  chassis.pid_wait();
+  chassis.pid_turn_relative_set(-90_deg, TURN_SPEED);
+  chassis.pid_wait();
+  chassis.pid_drive_set(20_in, DRIVE_SPEED);
+  chassis.pid_wait();
+  chassis.pid_turn_relative_set(-90_deg, TURN_SPEED);
+  chassis.pid_wait();
+  chassis.pid_drive_set(40_in, DRIVE_SPEED, true);
+  chassis.pid_wait_until(25_in);
+  lift.brake();
+  chassis.pid_wait();
+  pros::delay(2000);
 }
 
 ///
 // Auto that tests everything
 ///
-void combining_movements() {
-  chassis.pid_drive_set(24_in, DRIVE_SPEED, true);
+void red_positive_noalliance() {
+  lbr.tare_position();
+
+
+    
+  //swing back and left ~45 deg
+  chassis.pid_drive_set(-31_in, DRIVE_SPEED, true);
+  chassis.pid_wait();
+  chassis.pid_turn_set(-108_deg, 70, true);
+  chassis.pid_wait();
+  //drive backwards to pick up goal
+  chassis.pid_drive_set(-25_in, DRIVE_SPEED);
+  chassis.pid_wait();
+  chassis.pid_drive_set(-15_in, 100);
+  chassis.pid_wait_until(-13_in);
+  claw.set_value(true);
+  claw.set_value(true);
   chassis.pid_wait();
 
-  chassis.pid_turn_set(45_deg, TURN_SPEED);
+  lift.move(127);
+  //turn to face 2-ring stack
+  chassis.pid_turn_relative_set(-35_deg, TURN_SPEED); 
   chassis.pid_wait();
-
-  chassis.pid_swing_set(ez::RIGHT_SWING, -45_deg, SWING_SPEED, 45);
+  intake.move(127);
+  chassis.pid_drive_set(31_in, DRIVE_SPEED);
   chassis.pid_wait();
-
-  chassis.pid_turn_set(0_deg, TURN_SPEED);
+  chassis.pid_turn_relative_set(-105_deg, TURN_SPEED); 
   chassis.pid_wait();
-
-  chassis.pid_drive_set(-24_in, DRIVE_SPEED, true);
+  chassis.pid_drive_set(-5_in, DRIVE_SPEED);
+  chassis.pid_wait();
+  claw2.set_value(false);
+  claw.set_value(false);
+  chassis.pid_drive_set(5_in, DRIVE_SPEED);
+  chassis.pid_wait();
+  chassis.pid_turn_relative_set(180_deg, TURN_SPEED);
+  chassis.pid_wait();
+  chassis.pid_drive_set(-11_in, 80);
+  chassis.pid_wait_until(-10_in);
+  claw.set_value(true);
+  claw2.set_value(true);
+  chassis.pid_wait();
+  chassis.pid_turn_relative_set(90_deg, TURN_SPEED);
+  lbr.move_absolute(1400, 200);
+  while ((lbr.get_position() < 1390) && (lbr.get_position() > 1410)) { 
+    pros::delay(2);
+  }
+  chassis.pid_drive_set(30_in, 60, true);
   chassis.pid_wait();
 }
 

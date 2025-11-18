@@ -5,7 +5,7 @@ int liftcount;
 int lc; 
 int ct = 0; 
 int auton;
-
+int lco;
 int clkc = 0; 
 int doinkcount;
 
@@ -20,8 +20,8 @@ int doinkcount;
 // Chassis constructor
 ez::Drive chassis(
     // These are your drive motors, the first motor is used for sensing!
-    {-2, -3, 4},     // Left Chassis Ports (negative port will reverse it!)
-    {15, 16, -17},  // Right Chassis Ports (negative port will reverse it!)
+    {-2, -3, -4},     // Left Chassis Ports (negative port will reverse it!)
+    {15, 16, 17},  // Right Chassis Ports (negative port will reverse it!)
 
     5,      // IMU Port
     3.25,  // Wheel Diameter (Remember, 4" wheels without screw holes are actually 4.125!)
@@ -262,7 +262,8 @@ void lady_brown() {
 	while(true) { 
     pros::screen::erase();
     pros::screen::print(pros::E_TEXT_LARGE, 1, "%d", lbr.get_position());
-		if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_RIGHT)) { 
+		/*
+    if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_RIGHT)) { 
 			lbt ++;
 		}
 		if (lbt == 1) { 
@@ -294,8 +295,8 @@ void lady_brown() {
       }
 		}
 		if (lbt == 4) {
-      liftcount = 1;
-			lift.move(127);
+      //liftcount = 1;
+			//lift.move(127);
 		}
 		if (lbt == 5) { 
 			lbr.move_absolute(0, 200);
@@ -306,23 +307,30 @@ void lady_brown() {
         lbt = 0;
       }
 		}
-
+    */
     
     
 		if (master.get_digital(pros::E_CONTROLLER_DIGITAL_UP)) { 
-			lbr.move(127); 
+			lift.move(127);
 		}
 		if (master.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN)) { 
-			lbr.move(-127);
+      lco = liftcount;
+      liftcount = 3;
+			lift.move_relative(-30,100); 
+      while(lift.get_position() > -28 && lift.get_position() < -32) { 
+        pros::delay(2); 
+      }
+      lift.tare_position();
+      liftcount = lco; 
 		}
-		if (!(master.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN)) && !(master.get_digital(pros::E_CONTROLLER_DIGITAL_UP)) && (lbt != 1) && (lbt != 3) && (lbt != 5) && (lbt != 6)) { 
+		/* if (!(master.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN)) && !(master.get_digital(pros::E_CONTROLLER_DIGITAL_UP)) && (lbt != 1) && (lbt != 3) && (lbt != 5) && (lbt != 6)) { 
 			lbr.brake();
 		}
     if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_LEFT)) { 
       lbt = 0; 
       lbr.brake();
     }
-    
+    */
     pros::delay(20);
 	}
 }
@@ -334,7 +342,6 @@ void opcontrol() {
   // This is preference to what you like to drive on
   chassis.drive_brake_set(MOTOR_BRAKE_COAST);
   lbr.set_brake_mode(MOTOR_BRAKE_HOLD);
-  lbr.tare_position();
   pros::Task ladybrown(lady_brown);
   lbt = 0; 
   
@@ -347,6 +354,11 @@ void opcontrol() {
     // chassis.opcontrol_arcade_standard(ez::SINGLE);  // Standard single arcade
     // chassis.opcontrol_arcade_flipped(ez::SPLIT);    // Flipped split arcade
     // chassis.opcontrol_arcade_flipped(ez::SINGLE);   // Flipped single arcade
+
+    if (master.get_digital(pros::E_CONTROLLER_DIGITAL_UP)) { 
+			lift.move(127);
+
+    }
     if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_R1)) { 
       claw.set_value(true);
       claw2.set_value(true);
@@ -356,7 +368,10 @@ void opcontrol() {
       claw2.set_value(false);
     }
     if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)) {
-      liftcount = 1;
+      liftcount ++;
+      if(liftcount > 1) {
+        liftcount = 0;
+      }
     }
     if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_B)) {
       intake.brake();

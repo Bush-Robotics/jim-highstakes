@@ -128,8 +128,8 @@ void blue_negative() {
   chassis.pid_turn_set(-108_deg, 70, true); // inconsistent at 70
   chassis.pid_wait();
   //drive backwards to pick up goal
-  chassis.pid_drive_set(-40_in, DRIVE_SPEED, true); // inconsistent at drive_speed
-  chassis.pid_wait_until(-38_in);
+  chassis.pid_drive_set(-38_in, DRIVE_SPEED, true); // inconsistent at drive_speed
+  chassis.pid_wait_until(-36_in);
   claw.set_value(true);
   claw.set_value(true);
   chassis.pid_wait();
@@ -142,11 +142,11 @@ void blue_negative() {
   //chassis.pid_wait();
   //spin intake 
   intake.move(127);
-  chassis.pid_drive_set(10_in, 80, true); // inconsistent at 80 w/slew
+  chassis.pid_drive_set(13_in, 80, true); // inconsistent at 80 w/slew
   chassis.pid_wait();
   chassis.pid_turn_relative_set(33_deg, 80); // inconsistent at 80
   chassis.pid_wait();
-  chassis.pid_drive_set(25_in, DRIVE_SPEED, false); // inconsistent at 80
+  chassis.pid_drive_set(20_in, DRIVE_SPEED, false); // inconsistent at 80
   chassis.pid_wait();
   pros::delay(500);
   chassis.pid_turn_relative_set(90_deg, TURN_SPEED); // inconsistent at turn_speed
@@ -210,17 +210,17 @@ void blue_positive() {
   chassis.pid_wait();
   chassis.pid_turn_relative_set(-170_deg, TURN_SPEED);
   chassis.pid_wait();
-  chassis.pid_drive_set(-19_in, DRIVE_SPEED);
-  chassis.pid_wait_until(-17_in);
+  chassis.pid_drive_set(-16_in, DRIVE_SPEED);
+  chassis.pid_wait();
   claw.set_value(true);
   claw2.set_value(true);
-  chassis.pid_wait();
+
   chassis.pid_turn_relative_set(-90_deg, TURN_SPEED);
   lbr.move_absolute(1400, 200);
   while ((lbr.get_position() < 1390) && (lbr.get_position() > 1410)) { 
     pros::delay(2);
   }
-  chassis.pid_drive_set(30_in, 60, true);
+  chassis.pid_drive_set(34_in, 60, true);
   chassis.pid_wait();
 
 
@@ -368,7 +368,6 @@ void blue_negative_noalliance() {
   claw.set_value(true);
   chassis.pid_wait();
   //spin lift to score ring 
-  lift.move(127);
   // turn right > 90 deg, towards ring pile 
   chassis.pid_turn_set(-195_deg, TURN_SPEED); // inconsistent at turn_speed
   chassis.pid_wait();
@@ -377,6 +376,8 @@ void blue_negative_noalliance() {
   //spin intake 
   intake.move(127);
   chassis.pid_drive_set(10_in, 80, true); // inconsistent at 80 w/slew
+  chassis.pid_wait_until(5_in);
+  lift.move(127);
   chassis.pid_wait();
   chassis.pid_turn_relative_set(33_deg, 80); // inconsistent at 80
   chassis.pid_wait();
@@ -416,12 +417,13 @@ void blue_positive_noalliance() {
   claw.set_value(true);
   chassis.pid_wait();
 
-  lift.move(127);
   //turn to face 2-ring stack
   chassis.pid_turn_relative_set(35_deg, TURN_SPEED); 
   chassis.pid_wait();
   intake.move(127);
   chassis.pid_drive_set(29_in, DRIVE_SPEED);
+  chassis.pid_wait_until(5_in);
+  lift.move(127);
   chassis.pid_wait();
   chassis.pid_turn_relative_set(105_deg, TURN_SPEED); 
   chassis.pid_wait();
@@ -438,12 +440,9 @@ void blue_positive_noalliance() {
   claw.set_value(true);
   claw2.set_value(true);
   chassis.pid_wait();
-  chassis.pid_turn_relative_set(-90_deg, TURN_SPEED);
-  lbr.move_absolute(1400, 200);
-  while ((lbr.get_position() < 1390) && (lbr.get_position() > 1410)) { 
-    pros::delay(2);
-  }
-  chassis.pid_drive_set(30_in, 60, true);
+  chassis.pid_drive_set(5_in, DRIVE_SPEED);
+  chassis.pid_wait();
+  chassis.pid_turn_set(180_deg, TURN_SPEED);
   chassis.pid_wait();
 }
 
@@ -467,7 +466,6 @@ void red_negative_noalliance() {
   claw.set_value(true);
   chassis.pid_wait();
   //spin lift to score ring 
-  lift.move(127);
   // turn right > 90 deg, towards ring pile 
   chassis.pid_turn_set(195_deg, TURN_SPEED);
   chassis.pid_wait();
@@ -476,6 +474,8 @@ void red_negative_noalliance() {
   //spin intake 
   intake.move(127);
   chassis.pid_drive_set(20_in, 80,true);
+  chassis.pid_wait_until(5_in);
+  lift.move(127);
   chassis.pid_wait();
   chassis.pid_turn_relative_set(-33_deg, 80); 
   chassis.pid_wait();
@@ -516,12 +516,14 @@ void red_positive_noalliance() {
   claw.set_value(true);
   chassis.pid_wait();
 
-  lift.move(127);
+
   //turn to face 2-ring stack
   chassis.pid_turn_relative_set(-35_deg, TURN_SPEED); 
   chassis.pid_wait();
   intake.move(127);
   chassis.pid_drive_set(31_in, DRIVE_SPEED);
+  chassis.pid_wait_until(5_in);
+  lift.move(127);
   chassis.pid_wait();
   chassis.pid_turn_relative_set(-105_deg, TURN_SPEED); 
   chassis.pid_wait();
@@ -538,12 +540,9 @@ void red_positive_noalliance() {
   claw.set_value(true);
   claw2.set_value(true);
   chassis.pid_wait();
-  chassis.pid_turn_relative_set(90_deg, TURN_SPEED);
-  lbr.move_absolute(1400, 200);
-  while ((lbr.get_position() < 1390) && (lbr.get_position() > 1410)) { 
-    pros::delay(2);
-  }
-  chassis.pid_drive_set(30_in, 60, true);
+  chassis.pid_drive_set(5_in, DRIVE_SPEED);
+  chassis.pid_wait();
+  chassis.pid_turn_set(180_deg, TURN_SPEED);
   chassis.pid_wait();
 }
 
